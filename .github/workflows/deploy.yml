@@ -1,0 +1,81 @@
+name: Deploy OpenGL Lab
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout OpenGL Lab content
+        uses: actions/checkout@v6
+        with:
+          path: site
+
+      - name: Checkout Quartz 5
+        uses: actions/checkout@v6
+        with:
+          repository: jackyzha0/quartz
+          ref: v5
+          path: quartz
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: quartz/package-lock.json
+
+      - name: Assemble site
+        shell: bash
+        run: |
+          rm -rf quartz/content
+          mkdir -p quartz/content quartz/quartz/static
+          cp -R site/content/. quartz/content/
+          cp -R site/static/. quartz/quartz/static/
+          cp quartz/quartz/cli/templates/default.yaml quartz/quartz.config.yaml
+          python - <<'PY'
+          from pathlib import Path
+          p = Path('quartz/quartz.config.yaml')
+          s = p.read_text()
+          s = s.replace('pageTitle: Quartz 5', 'pageTitle: OpenGL Lab')
+          s = s.replace('locale: en-US', 'locale: zh-CN')
+          s = s.replace('baseUrl: quartz.jzhao.xyz', 'baseUrl: huangyukun26.github.io/myOpengl-lab')
+          s = s.replace('GitHub: https://github.com/jackyzha0/quartz', 'GitHub: https://github.com/huangyukun26/myOpengl-lab')
+          s = s.replace('        Discord Community: https://discord.gg/cRFFHYye7t\n', '')
+          p.write_text(s)
+          PY
+
+      - name: Install and build Quartz
+        working-directory: quartz
+        run: |
+          npm ci
+          npx quartz plugin install --from-config
+          npx quartz build
+
+      - name: Upload GitHub Pages artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: quartz/public
+
+  deploy:
+    needs: build
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy
+        id: deployment
+        uses: actions/deploy-pages@v4
