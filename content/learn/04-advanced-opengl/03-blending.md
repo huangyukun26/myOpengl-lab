@@ -44,7 +44,7 @@ glDepthMask(GL_TRUE);
 
 ## Interactive Lab
 
-[打开 Blending Lab](https://huangyukun26.github.io/myOpengl-lab/static/labs/blending.html)
+<a href="/myOpengl-lab/static/labs/blending.html" data-router-ignore>打开 Blending Lab</a>
 
 推荐按这个顺序玩：先改变 Alpha；再把绘制顺序切成 Near → Far；最后切换 Depth Write。观察某个 fragment 究竟是死在 Depth Test，还是成功进入 Blending。
 
