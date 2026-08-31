@@ -21,7 +21,9 @@ description: 按 LearnOpenGL 的阅读顺序推进，同时用渲染管线地图
 
 ## Interactive Labs
 
-<a href="/myOpengl-lab/static/labs/blending.html" data-router-ignore>打开 Blending Lab</a>
+<form action="/myOpengl-lab/static/labs/blending.html" method="get">
+  <button type="submit">🎮 打开 Blending Lab</button>
+</form>
 
 这里是真实 WebGL2 状态机。可以直接改 Blend Factor、Alpha、Draw Order、Depth Test、Depth Write 和 discard 阈值，观察 framebuffer 如何变化。
 
