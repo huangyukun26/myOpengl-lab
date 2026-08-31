@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="420" viewBox="0 0 1400 420" role="img" aria-labelledby="title desc">
+  <title id="title">OpenGL Rendering Pipeline learning map</title>
+  <desc id="desc">A simplified rendering pipeline with Blending highlighted as the first interactive chapter added to the site.</desc>
+  <defs>
+    <style>
+      .bg{fill:#0d1117}.box{fill:#161b22;stroke:#30363d;stroke-width:2}.boxActive{fill:#0d2740;stroke:#58a6ff;stroke-width:3}
+      .group{fill:#111820;stroke:#30363d;stroke-width:2;stroke-dasharray:7 7}.t{fill:#e6edf3;font:600 24px system-ui,-apple-system,"Segoe UI",sans-serif}
+      .s{fill:#8b949e;font:16px system-ui,-apple-system,"Segoe UI",sans-serif}.active{fill:#79c0ff;font:700 24px system-ui,-apple-system,"Segoe UI",sans-serif}
+      .line{stroke:#6e7681;stroke-width:3;fill:none}.arrow{fill:#6e7681}.tag{fill:#58a6ff;font:700 14px system-ui,-apple-system,"Segoe UI",sans-serif}
+    </style>
+    <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" class="arrow"/></marker>
+  </defs>
+  <rect class="bg" width="1400" height="420" rx="24"/>
+  <text x="54" y="55" class="t">OpenGL Rendering Pipeline · learning map</text>
+  <text x="54" y="84" class="s">Simplified for learning — each finished chapter can light up one part of the pipeline.</text>
+
+  <rect x="55" y="145" width="160" height="86" rx="14" class="box"/><text x="135" y="180" text-anchor="middle" class="t">Vertex Data</text><text x="135" y="207" text-anchor="middle" class="s">VAO / VBO</text>
+  <path d="M215 188 H270" class="line" marker-end="url(#arrow)"/>
+  <rect x="280" y="145" width="175" height="86" rx="14" class="box"/><text x="367" y="180" text-anchor="middle" class="t">Vertex Shader</text><text x="367" y="207" text-anchor="middle" class="s">clip position</text>
+  <path d="M455 188 H510" class="line" marker-end="url(#arrow)"/>
+  <rect x="520" y="145" width="190" height="86" rx="14" class="box"/><text x="615" y="180" text-anchor="middle" class="t">Assembly</text><text x="615" y="207" text-anchor="middle" class="s">primitive</text>
+  <path d="M710 188 H765" class="line" marker-end="url(#arrow)"/>
+  <rect x="775" y="145" width="185" height="86" rx="14" class="box"/><text x="867" y="180" text-anchor="middle" class="t">Rasterization</text><text x="867" y="207" text-anchor="middle" class="s">fragments</text>
+  <path d="M960 188 H1015" class="line" marker-end="url(#arrow)"/>
+  <rect x="1025" y="145" width="205" height="86" rx="14" class="box"/><text x="1127" y="180" text-anchor="middle" class="t">Fragment Shader</text><text x="1127" y="207" text-anchor="middle" class="s">src color</text>
+
+  <path d="M1230 188 H1270 V290 H1085" class="line" marker-end="url(#arrow)"/>
+  <rect x="600" y="270" width="500" height="112" rx="18" class="group"/>
+  <text x="625" y="300" class="s">Per-sample operations</text>
+  <rect x="625" y="316" width="130" height="46" rx="11" class="box"/><text x="690" y="346" text-anchor="middle" class="s">Stencil</text>
+  <path d="M755 339 H790" class="line" marker-end="url(#arrow)"/>
+  <rect x="800" y="316" width="130" height="46" rx="11" class="box"/><text x="865" y="346" text-anchor="middle" class="s">Depth</text>
+  <path d="M930 339 H965" class="line" marker-end="url(#arrow)"/>
+  <rect x="975" y="310" width="150" height="58" rx="12" class="boxActive"/><text x="1050" y="345" text-anchor="middle" class="active">Blending</text><text x="1090" y="328" class="tag">CURRENT</text>
+  <path d="M1125 339 H1190" class="line" marker-end="url(#arrow)"/>
+  <rect x="1200" y="296" width="150" height="86" rx="14" class="box"/><text x="1275" y="331" text-anchor="middle" class="t">Framebuffer</text><text x="1275" y="358" text-anchor="middle" class="s">dst → output</text>
+</svg>
