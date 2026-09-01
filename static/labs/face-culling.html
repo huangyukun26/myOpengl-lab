@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OpenGL Face Culling Lab</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;background:#0d1117;color:#e6edf3}main{max-width:1240px;margin:auto;padding:24px}h1{font-size:25px;margin:0 0 6px}.sub{color:#8b949e;line-height:1.65;margin-bottom:14px}.source{font-size:12px;color:#8b949e;margin-bottom:18px}.source a{color:#79c0ff}.pipeline{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 16px;font-size:12px}.pipe{padding:5px 9px;background:#21262d;border:1px solid #30363d;border-radius:999px}.pipe.active{outline:2px solid #58a6ff;color:#79c0ff}.arrow{color:#6e7681}.layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(330px,.75fr);gap:16px}.card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:16px}.stage{position:relative}#glcanvas{width:100%;aspect-ratio:16/10;display:block;border-radius:9px;border:1px solid #30363d;background:#080b10}.badge{position:absolute;top:26px;left:26px;background:#0d1117dd;border:1px solid #30363d;border-radius:999px;padding:6px 9px;font-size:12px}.ok{color:#3fb950}.warn{color:#d29922}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:10px}.stat{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:9px;text-align:center}.stat b{display:block;font-size:18px}.stat span{font-size:11px;color:#8b949e}.microscope{margin-top:12px;display:grid;grid-template-columns:180px 1fr;gap:12px;align-items:center;background:#0d1117;border:1px solid #30363d;border-radius:9px;padding:10px}#windingCanvas{width:180px;height:135px}.microtext{font-size:13px;line-height:1.65;color:#8b949e}.microtext strong{color:#e6edf3}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row{margin-bottom:14px}label{display:block;font-size:12px;color:#8b949e;margin-bottom:5px}select,input[type=range]{width:100%}select{background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:7px;padding:8px}.check{display:flex;gap:8px;align-items:center;margin:10px 0;font-size:13px;color:#e6edf3}.check input{width:auto}.seg{display:grid;grid-template-columns:1fr 1fr;gap:7px}.seg button,button{border:1px solid #30363d;background:#21262d;color:#e6edf3;border-radius:7px;padding:9px;cursor:pointer}.seg button.active{border-color:#58a6ff;background:#0d2740;color:#79c0ff}button:hover{background:#30363d}.full{width:100%}pre{margin:12px 0 0;padding:12px;overflow:auto;background:#0d1117;border:1px solid #30363d;border-radius:8px;font:12px/1.55 "SFMono-Regular",Consolas,monospace}.hint{font-size:12px;color:#8b949e;line-height:1.65;margin-top:10px}.experiment{margin-top:12px;padding:10px 12px;border-left:3px solid #58a6ff;background:#0d1117;border-radius:0 8px 8px 0;font-size:12px;line-height:1.65;color:#8b949e}.experiment strong{color:#e6edf3}@media(max-width:880px){.layout{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr)}.microscope{grid-template-columns:1fr}#windingCanvas{margin:auto}}
+</style>
+</head>
+<body><main>
+<h1>OpenGL · Face Culling Lab</h1>
+<div class="sub">用真实 WebGL2 的 <code>CULL_FACE / cullFace / frontFace</code> 玩环绕顺序。立方体顶点来自 LearnOpenGL 官方 Face Culling 练习；纹理直接加载官方 <code>marble.jpg</code>。</div>
+<div class="source">Source: <a href="https://learnopengl.com/Advanced-OpenGL/Face-culling" target="_blank" rel="noreferrer">LearnOpenGL · Face Culling</a> · <a href="https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/4.advanced_opengl/4.face_culling_exercise1/face_culling_exercise1.cpp" target="_blank" rel="noreferrer">official exercise vertex data</a></div>
+<div class="pipeline"><span class="pipe">Vertex Shader</span><span class="arrow">→</span><span class="pipe">Primitive Assembly</span><span class="arrow">→</span><span class="pipe active">Face Culling</span><span class="arrow">→</span><span class="pipe">Rasterization</span><span class="arrow">→</span><span class="pipe">Fragment Shader</span></div>
+<div class="layout">
+<section class="card stage">
+  <canvas id="glcanvas" width="900" height="560"></canvas>
+  <div id="modeBadge" class="badge">● initializing...</div>
+  <div class="stats">
+    <div class="stat"><b>12</b><span>submitted triangles</span></div>
+    <div class="stat"><b id="frontCount">—</b><span>front-facing</span></div>
+    <div class="stat"><b id="backCount">—</b><span>back-facing</span></div>
+    <div class="stat"><b id="culledCount">—</b><span>culled</span></div>
+  </div>
+  <div class="microscope">
+    <canvas id="windingCanvas" width="360" height="270"></canvas>
+    <div class="microtext"><strong id="microTitle">Winding microscope</strong><br><span id="microText">1 → 2 → 3 的屏幕环绕顺序决定 front/back。注意：这里不是看法线。</span></div>
+  </div>
+  <div class="hint">拖动立方体旋转；滚轮缩放。打开“朝向着色”时，未被剔除的 front/back 会用不同色调标出来。官方纹理加载失败时会自动使用本地生成的棋盘纹理，不会黑屏。</div>
+</section>
+<aside class="card">
+  <div class="row"><label>顶点数据</label><select id="windingData"><option value="ccw">教程：CCW front-facing 数据</option><option value="cw">官方练习：CW reversed 数据</option></select></div>
+  <div class="grid2"><div class="row"><label>glFrontFace</label><select id="frontFace"><option value="CCW">GL_CCW（默认）</option><option value="CW">GL_CW</option></select></div><div class="row"><label>glCullFace</label><select id="cullFace"><option value="BACK">GL_BACK（默认）</option><option value="FRONT">GL_FRONT</option><option value="FRONT_AND_BACK">GL_FRONT_AND_BACK</option></select></div></div>
+  <label class="check"><input id="cullEnabled" type="checkbox" checked> GL_CULL_FACE</label>
+  <label class="check"><input id="orientationTint" type="checkbox"> 朝向着色（看 gl_FrontFacing）</label>
+  <label class="check"><input id="autoRotate" type="checkbox" checked> 自动旋转</label>
+  <div class="row"><label>Camera</label><div class="seg"><button id="outsideBtn" class="active" type="button">Outside</button><button id="insideBtn" type="button">Inside Cube</button></div></div>
+  <div class="row"><label>Rotation <span id="rotationText">0°</span></label><input id="rotation" type="range" min="-180" max="180" value="0" step="1"></div>
+  <button id="reset" class="full" type="button">恢复教材默认状态</button>
+  <div class="experiment"><strong>推荐实验：</strong><br>先保持 CCW + BACK；然后只把 <code>glFrontFace</code> 改成 CW，看正常外表面消失。接着把顶点数据切到“官方练习 CW”，它会重新正常——这就是“数据 winding”和“front-face 状态”的配对。</div>
+  <pre id="code"></pre>
+</aside>
+</div>
+<script src="face-culling.js"></script>
+</main></body></html>
