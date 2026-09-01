@@ -36,7 +36,7 @@
   <label class="check"><input id="orientationTint" type="checkbox"> 朝向着色（看 gl_FrontFacing）</label>
   <label class="check"><input id="autoRotate" type="checkbox" checked> 自动旋转</label>
   <div class="row"><label>Camera</label><div class="seg"><button id="outsideBtn" class="active" type="button">Outside</button><button id="insideBtn" type="button">Inside Cube</button></div></div>
-  <div class="row"><label>Rotation <span id="rotationText">0°</span></label><input id="rotation" type="range" min="-180" max="180" value="0" step="1"></div>
+  <div class="row"><label>Rotation <span id="rotationText">32°</span></label><input id="rotation" type="range" min="-180" max="180" value="32" step="1"></div>
   <button id="reset" class="full" type="button">恢复教材默认状态</button>
   <div class="experiment"><strong>推荐实验：</strong><br>先保持 CCW + BACK；然后只把 <code>glFrontFace</code> 改成 CW，看正常外表面消失。接着把顶点数据切到“官方练习 CW”，它会重新正常——这就是“数据 winding”和“front-face 状态”的配对。</div>
   <pre id="code"></pre>
