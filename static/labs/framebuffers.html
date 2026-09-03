@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OpenGL Framebuffer Lab</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;background:#0d1117;color:#e6edf3}main{max-width:1280px;margin:auto;padding:24px}h1{font-size:26px;margin:0 0 6px}.sub{color:#8b949e;line-height:1.65;margin-bottom:10px}.source{font-size:12px;color:#8b949e;margin-bottom:16px}.source a{color:#79c0ff}.pipeline{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:16px;font-size:12px}.pipe{padding:5px 9px;background:#21262d;border:1px solid #30363d;border-radius:999px}.pipe.active{outline:2px solid #58a6ff;color:#79c0ff}.arrow{color:#6e7681}.layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(350px,.75fr);gap:16px}.card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:16px}.stage{position:relative}#glcanvas{width:100%;aspect-ratio:16/10;display:block;border-radius:9px;border:1px solid #30363d;background:#070a0f}.badge{position:absolute;top:26px;left:26px;background:#0d1117e8;border:1px solid #30363d;border-radius:999px;padding:6px 9px;font-size:12px}.ok{color:#3fb950}.warn{color:#d29922}.bad{color:#f85149}.passflow{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:stretch;margin-top:10px}.pass{background:#0d1117;border:1px solid #30363d;border-radius:9px;padding:10px}.pass b{display:block;margin-bottom:3px}.pass small{color:#8b949e;line-height:1.5}.passArrow{display:flex;align-items:center;color:#6e7681;font-size:20px}.attach{margin-top:10px;background:#0d1117;border:1px solid #30363d;border-radius:9px;padding:11px;font:12px/1.7 "SFMono-Regular",Consolas,monospace}.attach .tex{color:#79c0ff}.attach .rbo{color:#d2a8ff}.attach .badline{color:#f85149}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row{margin-bottom:14px}label{display:block;font-size:12px;color:#8b949e;margin-bottom:5px}select,input[type=range]{width:100%}select{background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:7px;padding:8px}.check{display:flex;gap:8px;align-items:flex-start;margin:10px 0;font-size:13px;color:#e6edf3;line-height:1.4}.check input{width:auto;margin-top:2px}button{border:1px solid #30363d;background:#21262d;color:#e6edf3;border-radius:7px;padding:9px;cursor:pointer}.full{width:100%}button:hover{background:#30363d}pre{margin:12px 0 0;padding:12px;overflow:auto;max-height:325px;background:#0d1117;border:1px solid #30363d;border-radius:8px;font:11.5px/1.55 "SFMono-Regular",Consolas,monospace}.hint{font-size:12px;color:#8b949e;line-height:1.65;margin-top:10px}.experiment{margin-top:12px;padding:10px 12px;border-left:3px solid #58a6ff;background:#0d1117;border-radius:0 8px 8px 0;font-size:12px;line-height:1.65;color:#8b949e}.experiment strong{color:#e6edf3}.statusgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.stat{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:9px;text-align:center}.stat b{display:block;font-size:14px}.stat span{font-size:10px;color:#8b949e}@media(max-width:900px){.layout{grid-template-columns:1fr}.passflow{grid-template-columns:1fr}.passArrow{justify-content:center;transform:rotate(90deg)}.statusgrid{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<h1>OpenGL · Framebuffer Lab</h1>
+<div class="sub">把场景先画到 <code>FBO → COLOR_ATTACHMENT0 texture</code>，再把这张纹理交给第二个全屏 pass。这里用真实 WebGL2 framebuffer API 映射 OpenGL 的 FBO 思维模型。</div>
+<div class="source">Scene assets: <a href="https://github.com/JoeyDeVries/LearnOpenGL/tree/master/resources/textures" target="_blank" rel="noreferrer">LearnOpenGL official textures</a> · source structure follows <a href="https://github.com/JoeyDeVries/LearnOpenGL/blob/master/src/4.advanced_opengl/5.1.framebuffers/framebuffers.cpp" target="_blank" rel="noreferrer">official framebuffer example</a></div>
+<div class="pipeline"><span class="pipe">Fragment Shader</span><span class="arrow">→</span><span class="pipe">Depth / Stencil / Blending</span><span class="arrow">→</span><span class="pipe active">Framebuffer Target</span><span class="arrow">→</span><span class="pipe">Texture</span><span class="arrow">→</span><span class="pipe">Second Pass</span></div>
+<div class="layout">
+<section class="card stage">
+  <canvas id="glcanvas" width="960" height="600"></canvas>
+  <div id="modeBadge" class="badge">● initializing...</div>
+  <div class="passflow">
+    <div class="pass"><b>Pass 1 · Scene</b><small id="pass1Text">bind custom FBO → clear → depth test → draw cubes + floor</small></div>
+    <div class="passArrow">→</div>
+    <div class="pass"><b>Pass 2 · Screen Quad</b><small id="pass2Text">bind default framebuffer → sample color attachment → post-process</small></div>
+  </div>
+  <div class="statusgrid">
+    <div class="stat"><b id="fboStatus">—</b><span>FBO status</span></div>
+    <div class="stat"><b id="attachmentSize">—</b><span>color attachment</span></div>
+    <div class="stat"><b id="targetStatus">—</b><span>current render path</span></div>
+  </div>
+  <div id="attachmentTree" class="attach"></div>
+  <div class="hint">拖动画面旋转相机；滚轮缩放。官方纹理加载失败会切到程序生成的 fallback，不会黑屏。</div>
+</section>
+<aside class="card">
+  <div class="row"><label>渲染路径</label><select id="renderPath"><option value="fbo">两遍渲染：Custom FBO → Screen Quad</option><option value="direct">直接画到默认 Framebuffer（绕过 FBO）</option></select></div>
+  <div class="row"><label>Post-processing</label><select id="effect"><option value="0">None · 原图</option><option value="1">Inversion · 反相</option><option value="2">Grayscale · 加权灰度</option><option value="3">Sharpen · 锐化 3×3 kernel</option><option value="4">Blur · 模糊 3×3 kernel</option><option value="5">Edge Detection · 边缘检测</option></select></div>
+  <div class="grid2"><div class="row"><label>Color Attachment Resolution</label><select id="resolutionScale"><option value="1">1.0×</option><option value="0.5">0.5×</option><option value="0.25">0.25×</option></select></div><div class="row"><label>Kernel sample distance <span id="kernelText">1 px</span></label><input id="kernelRadius" type="range" min="1" max="5" value="1" step="1"></div></div>
+  <label class="check"><input id="depthAttachment" type="checkbox" checked><span>Depth/Stencil Attachment（Renderbuffer）<br><small style="color:#8b949e">关闭后 FBO 仍可 complete，但深度遮挡会失效。</small></span></label>
+  <label class="check"><input id="compare" type="checkbox"><span>Raw / Processed 对照显示<br><small style="color:#8b949e">左：COLOR_ATTACHMENT0 原图；右：第二遍 shader 结果。</small></span></label>
+  <label class="check"><input id="breakFbo" type="checkbox"><span>故意移除 Color Attachment<br><small style="color:#8b949e">观察 <code>glCheckFramebufferStatus</code> 失败。</small></span></label>
+  <label class="check"><input id="autoRotate" type="checkbox" checked> 自动旋转相机</label>
+  <button id="reset" class="full" type="button">恢复教材默认实验</button>
+  <div class="experiment"><strong>推荐顺序：</strong><br>① None → Inversion，确认“整张场景已经变成一张纹理”；② 关闭 Depth/Stencil Attachment，看画面层级为什么乱；③ 把 attachment 改成 0.25×，理解为什么 FBO 尺寸变化时必须配套 <code>glViewport</code>；④ 最后故意移除 Color Attachment，看 FBO completeness。</div>
+  <pre id="code"></pre>
+</aside>
+</div>
+<script src="framebuffers.js"></script>
+</main></body></html>
