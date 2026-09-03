@@ -38,8 +38,9 @@
   <label class="check"><input id="compare" type="checkbox"><span>Raw / Processed 对照显示<br><small style="color:#8b949e">左：COLOR_ATTACHMENT0 原图；右：第二遍 shader 结果。</small></span></label>
   <label class="check"><input id="breakFbo" type="checkbox"><span>故意移除 Color Attachment<br><small style="color:#8b949e">观察 <code>glCheckFramebufferStatus</code> 失败。</small></span></label>
   <label class="check"><input id="autoRotate" type="checkbox" checked> 自动旋转相机</label>
+  <button class="full" type="button" style="margin-bottom:9px;border-color:#58a6ff" onclick="location.href='framebuffers-rearview.html'">🚗 打开 Rear-view Mirror Mini Demo</button>
   <button id="reset" class="full" type="button">恢复教材默认实验</button>
-  <div class="experiment"><strong>推荐顺序：</strong><br>① None → Inversion，确认“整张场景已经变成一张纹理”；② 关闭 Depth/Stencil Attachment，看画面层级为什么乱；③ 把 attachment 改成 0.25×，理解为什么 FBO 尺寸变化时必须配套 <code>glViewport</code>；④ 最后故意移除 Color Attachment，看 FBO completeness。</div>
+  <div class="experiment"><strong>推荐顺序：</strong><br>① None → Inversion，确认“整张场景已经变成一张纹理”；② 关闭 Depth/Stencil Attachment，看画面层级为什么乱；③ 把 attachment 改成 0.25×，理解为什么 FBO 尺寸变化时必须配套 <code>glViewport</code>；④ 最后故意移除 Color Attachment，看 FBO completeness；⑤ 打开 Rear-view Mirror Mini Demo，看同一场景如何用相反 Camera 再渲染一次并贴到小 Quad。</div>
   <pre id="code"></pre>
 </aside>
 </div>
