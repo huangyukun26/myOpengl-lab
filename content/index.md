@@ -9,16 +9,17 @@ description: 按 LearnOpenGL 的阅读顺序推进，同时用渲染管线地图
 
 ![OpenGL Rendering Pipeline](static/rendering-pipeline.svg)
 
-> 这张图是学习用的简化管线。高亮节点表示已经有对应交互章节；以后每学完一节继续扩展，而不是把 LearnOpenGL 原文重新抄一遍。
+> 这张图是学习用的简化管线。高亮节点表示当前章节；绿色节点表示已经学过并有对应交互章节。以后每学完一节继续扩展，而不是把 LearnOpenGL 原文重新抄一遍。
 
 ## LearnOpenGL 学习顺序
 
 ### Advanced OpenGL
 
 [[learn/04-advanced-opengl/03-blending|03 · Blending 混合]]  
-[[learn/04-advanced-opengl/04-face-culling|04 · Face Culling 面剔除]]
+[[learn/04-advanced-opengl/04-face-culling|04 · Face Culling 面剔除]]  
+[[learn/04-advanced-opengl/05-framebuffers|05 · Framebuffers 帧缓冲]]
 
-当前新增：`winding order`、`glFrontFace`、`glCullFace`，以及 Face Culling 在 **Rasterization 之前**如何整块丢掉三角形。
+当前重点：**FBO 是这一遍渲染的目标组织对象；attachments 才真正保存 color / depth / stencil。** 把场景先写进 color texture，再让下一遍 shader 采样它，就进入了真正的 multi-pass rendering。
 
 ## Interactive Labs
 
@@ -28,6 +29,10 @@ description: 按 LearnOpenGL 的阅读顺序推进，同时用渲染管线地图
 
 <form action="/myOpengl-lab/static/labs/face-culling.html" method="get">
   <button type="submit">🎮 Face Culling Lab · 官方 cube / marble</button>
+</form>
+
+<form action="/myOpengl-lab/static/labs/framebuffers.html" method="get">
+  <button type="submit">🎮 Framebuffer Lab · 官方 container / metal + Post-processing</button>
 </form>
 
 每个 Lab 都尽量直接映射 OpenGL 状态机，而不是只做动画示意。独立 WebGL 页面采用完整页面加载，避免 Quartz SPA 干扰 WebGL 初始化。
