@@ -17,9 +17,10 @@ description: 按 LearnOpenGL 的阅读顺序推进，同时用渲染管线地图
 
 [[learn/04-advanced-opengl/03-blending|03 · Blending 混合]]  
 [[learn/04-advanced-opengl/04-face-culling|04 · Face Culling 面剔除]]  
-[[learn/04-advanced-opengl/05-framebuffers|05 · Framebuffers 帧缓冲]]
+[[learn/04-advanced-opengl/05-framebuffers|05 · Framebuffers 帧缓冲]]  
+[[learn/04-advanced-opengl/06-cubemaps|06 · Cubemaps 立方体贴图]]
 
-当前重点：**FBO 是这一遍渲染的目标组织对象；attachments 才真正保存 color / depth / stencil。** 把场景先写进 color texture，再让下一遍 shader 采样它，就进入了真正的 multi-pass rendering。
+当前重点：**Cubemap 不是新的 Pipeline Stage，而是一种被 Shader 采样的 Texture Resource。** 普通 `sampler2D` 用 `vec2 UV` 查颜色；`samplerCube` 用 `vec3 direction` 查环境。Skybox、Reflection、Refraction 都是在构造不同的采样方向。
 
 ## Interactive Labs
 
@@ -33,6 +34,10 @@ description: 按 LearnOpenGL 的阅读顺序推进，同时用渲染管线地图
 
 <form action="/myOpengl-lab/static/labs/framebuffers.html" method="get">
   <button type="submit">🎮 Framebuffer Lab · 官方 container / metal + Post-processing</button>
+</form>
+
+<form action="/myOpengl-lab/static/labs/cubemaps.html" method="get">
+  <button type="submit">🎮 Cubemap / Skybox Lab · 官方 skybox + Reflection / Refraction</button>
 </form>
 
 每个 Lab 都尽量直接映射 OpenGL 状态机，而不是只做动画示意。独立 WebGL 页面采用完整页面加载，避免 Quartz SPA 干扰 WebGL 初始化。
