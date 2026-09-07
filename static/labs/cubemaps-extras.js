@@ -25,7 +25,13 @@ const U=(p,n)=>gl.getUniformLocation(p,n),SM=(p,n,m)=>gl.uniformMatrix4fv(U(p,n)
 function ident(){const m=new Float32Array(16);m[0]=m[5]=m[10]=m[15]=1;return m}function perspective(fov,a,n,f){const m=new Float32Array(16),t=1/Math.tan(fov/2);m[0]=t/a;m[5]=t;m[10]=(f+n)/(n-f);m[11]=-1;m[14]=2*f*n/(n-f);return m}function norm(v){const l=Math.hypot(...v)||1;return v.map(x=>x/l)}function cross(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]}function lookAt(e,c,u){const z=norm([e[0]-c[0],e[1]-c[1],e[2]-c[2]]),x=norm(cross(u,z)),y=cross(z,x),m=ident();m[0]=x[0];m[1]=y[0];m[2]=z[0];m[4]=x[1];m[5]=y[1];m[6]=z[1];m[8]=x[2];m[9]=y[2];m[10]=z[2];m[12]=-(x[0]*e[0]+x[1]*e[1]+x[2]*e[2]);m[13]=-(y[0]*e[0]+y[1]*e[1]+y[2]*e[2]);m[14]=-(z[0]*e[0]+z[1]*e[1]+z[2]*e[2]);return m}function trs(x,y,z,s){const m=ident();m[0]=m[5]=m[10]=s;m[12]=x;m[13]=y;m[14]=z;return m}function rotViewOnly(v){const r=new Float32Array(v);r[12]=r[13]=r[14]=0;return r}
 function makeSphere(seg=64,rings=32){const a=[];for(let y=0;y<rings;y++){const v0=y/rings,v1=(y+1)/rings,t0=v0*Math.PI,t1=v1*Math.PI;for(let x=0;x<seg;x++){const u0=x/seg,u1=(x+1)/seg,p0=u0*Math.PI*2,p1=u1*Math.PI*2;const q=(t,p,u,v)=>[Math.sin(t)*Math.cos(p),Math.cos(t),Math.sin(t)*Math.sin(p),Math.sin(t)*Math.cos(p),Math.cos(t),Math.sin(t)*Math.sin(p),u,v];const q00=q(t0,p0,u0,v0),q01=q(t1,p0,u0,v1),q11=q(t1,p1,u1,v1),q10=q(t0,p1,u1,v0);for(const z of [q00,q01,q11,q00,q11,q10])a.push(...z)}}return new Float32Array(a)}
 function vaoSphere(data){const vao=gl.createVertexArray(),b=gl.createBuffer();gl.bindVertexArray(vao);gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,32,0);gl.enableVertexAttribArray(1);gl.vertexAttribPointer(1,3,gl.FLOAT,false,32,12);gl.enableVertexAttribArray(2);gl.vertexAttribPointer(2,2,gl.FLOAT,false,32,24);return{vao,count:data.length/8}}
-const cubePos=new Float32Array([-1,-1,-1,1,1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,1,1,-1,-1,-1,1,1,-1,1,1,1,1,-1,-1,1,1,1,1,-1,1,1,-1,1,1,-1,1,-1,-1,-1,-1,-1,-1,1,-1,1,1,-1,-1,-1,-1,-1,1,-1,1,-1,1,1,1,1,-1,-1,1,1,1,-1,1,-1,-1,-1,-1,1,-1,-1,1,1,-1,-1,-1,-1,-1,1,-1,-1,1,1,1,-1,-1,1,1,1,1,-1,1,-1,1,-1,1,1,1,1,1,1,1,-1,1,-1,1,-1]);
+const cubePos=new Float32Array([
+-1,-1,-1, 1,-1,-1, 1,1,-1, 1,1,-1,-1,1,-1,-1,-1,-1,
+-1,-1,1, 1,1,1, 1,-1,1, 1,1,1,-1,-1,1,-1,1,1,
+-1,1,1,-1,1,-1,-1,-1,-1,-1,-1,-1,-1,-1,1,-1,1,1,
+1,1,1,1,-1,-1,1,1,-1,1,-1,-1,1,1,1,1,-1,1,
+-1,-1,-1,1,-1,-1,1,-1,1,1,-1,1,-1,-1,1,-1,-1,-1,
+-1,1,-1,1,1,1,1,1,-1,1,1,1,-1,1,-1,-1,1,1]);
 function vaoPos(data){const vao=gl.createVertexArray(),b=gl.createBuffer();gl.bindVertexArray(vao);gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW);gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,12,0);return{vao,count:data.length/3}}
 const sphere=vaoSphere(makeSphere()),cube=vaoPos(cubePos),sky=cube;
 
