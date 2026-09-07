@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OpenGL Cubemap Lab</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;background:#0d1117;color:#e6edf3}main{max-width:1320px;margin:auto;padding:24px}h1{font-size:27px;margin:0 0 6px}.sub{color:#8b949e;line-height:1.65;margin-bottom:8px}.source{font-size:12px;color:#8b949e;margin-bottom:16px}.source a{color:#79c0ff}.pipeline{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-bottom:16px;font-size:12px}.pipe{padding:5px 9px;background:#21262d;border:1px solid #30363d;border-radius:999px}.pipe.active{outline:2px solid #58a6ff;color:#79c0ff}.arrow{color:#6e7681}.layout{display:grid;grid-template-columns:minmax(0,1.4fr) minmax(360px,.8fr);gap:16px}.card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:16px}.stage{position:relative}#glcanvas{width:100%;aspect-ratio:16/10;display:block;border-radius:9px;border:1px solid #30363d;background:#070a0f}.badge{position:absolute;top:26px;left:26px;background:#0d1117e8;border:1px solid #30363d;border-radius:999px;padding:6px 9px;font-size:12px}.ok{color:#3fb950}.warn{color:#d29922}.bad{color:#f85149}.statusgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}.stat{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:9px;text-align:center}.stat b{display:block;font-size:14px}.stat span{font-size:10px;color:#8b949e}.row{margin-bottom:14px}label{display:block;font-size:12px;color:#8b949e;margin-bottom:5px}select,input[type=range]{width:100%}select{background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:7px;padding:8px}.check{display:flex;gap:8px;align-items:flex-start;margin:10px 0;font-size:13px;color:#e6edf3;line-height:1.4}.check input{width:auto;margin-top:2px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}.panel{margin-top:11px;background:#0d1117;border:1px solid #30363d;border-radius:9px;padding:11px}.panel h3{font-size:13px;margin:0 0 8px}.face{font:12px/1.65 "SFMono-Regular",Consolas,monospace;color:#c9d1d9}.face strong{color:#79c0ff}.facegrid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;margin-top:8px}.facepill{border:1px solid #30363d;border-radius:7px;padding:5px 7px;font-size:11px;color:#8b949e}.facepill.hit{border-color:#58a6ff;color:#79c0ff;background:#0d2740}.hint{font-size:12px;color:#8b949e;line-height:1.65;margin-top:10px}.explain{margin-top:12px;padding:10px 12px;border-left:3px solid #58a6ff;background:#0d1117;border-radius:0 8px 8px 0;font-size:12px;line-height:1.65;color:#8b949e}.explain strong{color:#e6edf3}button{border:1px solid #30363d;background:#21262d;color:#e6edf3;border-radius:7px;padding:9px;cursor:pointer}.full{width:100%}button:hover{background:#30363d}pre{margin:12px 0 0;padding:12px;overflow:auto;max-height:360px;background:#0d1117;border:1px solid #30363d;border-radius:8px;font:11.5px/1.55 "SFMono-Regular",Consolas,monospace}.ior{font-family:"SFMono-Regular",Consolas,monospace;color:#79c0ff}.mini{font-size:11px;color:#8b949e;line-height:1.5}@media(max-width:930px){.layout{grid-template-columns:1fr}.statusgrid{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<h1>OpenGL · Cubemap / Skybox Lab</h1>
+<div class="sub">核心不是“给立方体贴 6 张普通纹理”，而是：<b>一个 Cubemap Texture 用一个 3D 方向向量采样。</b> Skybox、Reflection、Refraction 都是在重复这件事。</div>
+<div class="source">Skybox faces: LearnOpenGL official <a href="https://github.com/JoeyDeVries/LearnOpenGL/tree/master/resources/textures/skybox" target="_blank" rel="noreferrer">resources/textures/skybox</a> · code reference: <a href="https://github.com/JoeyDeVries/LearnOpenGL/tree/master/src/4.advanced_opengl/6.1.cubemaps_skybox" target="_blank" rel="noreferrer">6.1 cubemaps_skybox</a></div>
+<div class="pipeline"><span class="pipe">Geometry</span><span class="arrow">→</span><span class="pipe">Rasterization</span><span class="arrow">→</span><span class="pipe">Fragment Shader</span><span class="arrow">↔</span><span class="pipe active">samplerCube · direction vec3</span><span class="arrow">→</span><span class="pipe">Framebuffer</span></div>
+<div class="layout">
+<section class="card stage">
+  <canvas id="glcanvas" width="960" height="600"></canvas>
+  <div id="modeBadge" class="badge">● initializing...</div>
+  <div class="statusgrid">
+    <div class="stat"><b id="sampleFace">—</b><span>direction hits face</span></div>
+    <div class="stat"><b id="skyMode">—</b><span>skybox strategy</span></div>
+    <div class="stat"><b id="materialStat">—</b><span>center object</span></div>
+  </div>
+  <div class="hint">拖动画面旋转相机；滚轮改变距离。中央物体使用同一张 cubemap 做反射/折射。官方 6 张 skybox 图片加载失败时会自动切换到程序生成的 6 色 cubemap。</div>
+  <div class="explain"><strong>观察重点：</strong>先选 Reflection，转动相机；你会看到物体表面颜色跟着观察方向变化，因为每个 fragment 都在计算新的反射方向 <code>R</code>，再用 <code>texture(cubemap, R)</code> 查环境。</div>
+</section>
+<aside class="card">
+  <div class="row"><label>中央物体 / Environment Mapping</label><select id="material"><option value="reflect">Reflection · 镜面反射</option><option value="refract">Refraction · 折射</option><option value="normal">Normal Debug · 看法线方向</option><option value="none">隐藏物体，只看 Skybox</option></select></div>
+  <div class="grid2">
+    <div class="row"><label>Geometry</label><select id="geometry"><option value="sphere">Sphere · 更容易看反射</option><option value="cube">Cube · 教材默认思路</option></select></div>
+    <div class="row"><label>Refraction IOR <span id="iorText" class="ior">1.52</span></label><input id="ior" type="range" min="1.00" max="2.42" step="0.01" value="1.52"></div>
+  </div>
+  <label class="check"><input id="removeTranslation" type="checkbox" checked><span>Skybox 移除 View Translation<br><small class="mini">保持旋转，去掉相机位移：天空盒永远以相机为中心。</small></span></label>
+  <label class="check"><input id="optimized" type="checkbox" checked><span>Skybox 最后绘制优化<br><small class="mini"><code>pos.xyww</code> + <code>LEQUAL</code>，让天空盒深度固定在最远处。</small></span></label>
+
+  <div class="panel">
+    <h3>Direction Sampling Microscope</h3>
+    <div class="grid2">
+      <div class="row"><label>X <span id="dxText">0.8</span></label><input id="dx" type="range" min="-1" max="1" step="0.05" value="0.8"></div>
+      <div class="row"><label>Y <span id="dyText">0.3</span></label><input id="dy" type="range" min="-1" max="1" step="0.05" value="0.3"></div>
+    </div>
+    <div class="row"><label>Z <span id="dzText">-0.2</span></label><input id="dz" type="range" min="-1" max="1" step="0.05" value="-0.2"></div>
+    <div id="directionInfo" class="face"></div>
+    <div class="facegrid">
+      <div class="facepill" data-face="+X">+X · right.jpg</div><div class="facepill" data-face="-X">-X · left.jpg</div>
+      <div class="facepill" data-face="+Y">+Y · top.jpg</div><div class="facepill" data-face="-Y">-Y · bottom.jpg</div>
+      <div class="facepill" data-face="+Z">+Z · front.jpg</div><div class="facepill" data-face="-Z">-Z · back.jpg</div>
+    </div>
+    <div class="mini" style="margin-top:8px">Cubemap 先看绝对值最大的轴决定命中哪一面，再在该面上计算 2D 坐标。向量长度不重要，方向才重要。</div>
+  </div>
+  <button id="reset" class="full" type="button">恢复推荐实验状态</button>
+  <pre id="code"></pre>
+</aside>
+</div>
+<script src="cubemaps.js"></script>
+</main></body></html>
