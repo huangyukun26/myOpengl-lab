@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cubemap Extras Lab</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}*{box-sizing:border-box}body{margin:0;background:#0d1117;color:#e6edf3}main{max-width:1320px;margin:auto;padding:24px}h1{margin:0 0 6px;font-size:27px}.sub{color:#8b949e;line-height:1.65;margin-bottom:16px}.layout{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(360px,.75fr);gap:16px}.card{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:16px}canvas{width:100%;aspect-ratio:16/10;display:block;background:#070a0f;border:1px solid #30363d;border-radius:9px}.badge{display:inline-block;border:1px solid #30363d;border-radius:999px;padding:5px 9px;font-size:12px;margin-bottom:10px}.ok{color:#3fb950}.warn{color:#d29922}.panel{background:#0d1117;border:1px solid #30363d;border-radius:9px;padding:12px;margin-bottom:12px}.panel h3{margin:0 0 8px;font-size:14px}.row{margin-bottom:12px}label{display:block;color:#8b949e;font-size:12px;margin-bottom:5px}select,input[type=range]{width:100%}select{background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:7px;padding:8px}.check{display:flex;gap:8px;align-items:flex-start;color:#e6edf3;font-size:13px;line-height:1.45}.check input{margin-top:2px}.mini{font-size:11px;line-height:1.55;color:#8b949e}.readout{font:11.5px/1.6 "SFMono-Regular",Consolas,monospace;color:#c9d1d9}.readout b{color:#79c0ff}.flow{padding:10px 12px;border-left:3px solid #58a6ff;background:#0d1117;border-radius:0 8px 8px 0;color:#8b949e;font-size:12px;line-height:1.65;margin-top:10px}.flow strong{color:#e6edf3}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.facegrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:8px}.face{border:1px solid #30363d;border-radius:7px;padding:7px;text-align:center;font:11px/1.4 "SFMono-Regular",Consolas,monospace;color:#8b949e}.face.active{border-color:#58a6ff;color:#79c0ff;background:#0d2740}.bar{height:8px;border-radius:999px;background:#21262d;overflow:hidden;margin-top:6px}.bar>i{display:block;height:100%;width:100%;background:#58a6ff;transform-origin:left}.button{display:inline-block;border:1px solid #30363d;background:#21262d;color:#e6edf3;border-radius:7px;padding:8px 10px;text-decoration:none}pre{white-space:pre-wrap;background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:11px;font:11.5px/1.55 "SFMono-Regular",Consolas,monospace;max-height:340px;overflow:auto}@media(max-width:900px){.layout{grid-template-columns:1fr}.grid2{grid-template-columns:1fr}}
+</style>
+</head>
+<body><main>
+<h1>Cubemap · Reflection Map + Dynamic Environment Lab</h1>
+<div class="sub">把教材后面的两个练习拆成两个实验：<b>Reflection Map 决定“哪里反射”</b>；<b>Dynamic Cubemap 决定“反射里有没有当前动态场景”</b>。</div>
+<div class="layout">
+<section class="card">
+  <div id="badge" class="badge">● initializing...</div>
+  <canvas id="glcanvas" width="960" height="600"></canvas>
+  <div id="explain" class="flow"></div>
+  <div class="flow"><strong>观察方法：</strong>Reflection Map 模式看球面上“普通材质 ↔ 镜面环境”分区；Dynamic 模式看周围彩色方块移动时，它们是否同步出现在中心镜面球的反射里。</div>
+</section>
+<aside class="card">
+  <div class="panel">
+    <h3>实验选择</h3>
+    <div class="row"><label>Experiment</label><select id="experiment"><option value="mask">C · Reflection Map / Mask</option><option value="dynamic">D · Dynamic Environment Map</option></select></div>
+  </div>
+
+  <div id="maskPanel" class="panel">
+    <h3>C · Reflection Map</h3>
+    <div class="row"><label>Reflection Strength <span id="maskStrengthText">1.00</span></label><input id="maskStrength" type="range" min="0" max="1" step="0.01" value="1"></div>
+    <div class="row"><label>Mask Pattern</label><select id="maskPattern"><option value="bands">Bands · 条纹</option><option value="checker">Checker · 棋盘</option><option value="top">Top Half · 上半球</option></select></div>
+    <label class="check"><input id="showMask" type="checkbox"><span>只看 Mask（白=强反射，黑=弱反射）</span></label>
+    <div class="readout" id="maskReadout"></div>
+  </div>
+
+  <div id="dynamicPanel" class="panel" hidden>
+    <h3>D · Dynamic Environment Map</h3>
+    <div class="row"><label>Reflection Source</label><select id="envSource"><option value="static">Static Cubemap · 预制天空</option><option value="dynamic" selected>Dynamic Cubemap · 每帧捕获</option></select></div>
+    <label class="check"><input id="animate" type="checkbox" checked><span>让周围彩色物体运动</span></label>
+    <div class="row"><label>Capture Resolution <span id="resText">256</span></label><input id="captureRes" type="range" min="64" max="512" step="64" value="256"></div>
+    <div class="readout" id="dynamicReadout"></div>
+    <div class="facegrid" id="faceGrid"><div class="face">+X</div><div class="face">-X</div><div class="face">+Y</div><div class="face">-Y</div><div class="face">+Z</div><div class="face">-Z</div></div>
+    <div class="mini" style="margin-top:8px">Dynamic 模式每帧把相机临时放在镜面球中心，90° FOV 朝 6 个方向渲染到 Cubemap 六个 face。中心球本身不会被捕获，避免“自己反射自己”。</div>
+  </div>
+
+  <div class="panel"><h3>对应代码</h3><pre id="code"></pre></div>
+  <form action="/myOpengl-lab/static/labs/cubemaps.html" method="get"><button class="button" type="submit">← 回 Cubemap 主 Lab</button></form>
+</aside>
+</div>
+<script src="cubemaps-extras.js"></script>
+</main></body></html>
