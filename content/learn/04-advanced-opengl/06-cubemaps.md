@@ -113,17 +113,26 @@ Cubemap **不是新的固定渲染阶段**。它是一种 Texture Resource，通
 ## Interactive Lab
 
 <form action="/myOpengl-lab/static/labs/cubemaps.html" method="get">
-  <button type="submit">🎮 打开 Cubemap / Skybox Lab</button>
+  <button type="submit">🎮 打开 Cubemap / Skybox 主 Lab</button>
 </form>
 
-Lab 直接加载 LearnOpenGL 官方 `resources/textures/skybox` 六张图，并提供：
+<form action="/myOpengl-lab/static/labs/cubemaps-extras.html" method="get">
+  <button type="submit">🧪 Reflection Map + Dynamic Environment Lab</button>
+</form>
+
+主 Lab 直接加载 LearnOpenGL 官方 `resources/textures/skybox` 六张图，并提供：
 
 - `Reflection / Refraction / Normal Debug`
 - Sphere / Cube 切换
 - 折射率 IOR 调节
-- 开关“移除 View Translation”，直接看 Skybox 为什么必须跟随相机中心
-- 开关教程的 `Skybox Last + pos.xyww + LEQUAL` 优化
+- 把 Camera Translation / Rotation 拆开，直接观察为什么 Skybox 必须移除 View Translation
+- `Skybox Last + pos.xyww + LEQUAL` 的 Fragment 工作量示意
 - Direction Sampling Microscope：拖动 `(x,y,z)`，看方向到底命中 `+X/-X/+Y/-Y/+Z/-Z` 哪一面
+
+额外 Lab 专门做教材后面的两个练习：
+
+- **Reflection Map**：用一张 2D Mask 控制同一个物体“哪里反射、反射多少”，避免整个模型都变成镜子。
+- **Dynamic Environment Map**：在镜面球周围放动态物体；Static 模式下它们不会出现在环境反射里，Dynamic 模式则会从球心朝六个方向实时渲染进 Cubemap，再让球采样这张动态环境贴图。
 
 ## 和上一节 Framebuffer 串起来
 
