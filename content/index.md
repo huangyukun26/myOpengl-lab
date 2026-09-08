@@ -1,15 +1,15 @@
 ---
 title: OpenGL Lab
-description: 按 LearnOpenGL 的阅读顺序推进，同时用渲染管线地图建立整体心智模型。
+description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整渲染管线中理解。
 ---
 
 # OpenGL Lab
 
-按 **LearnOpenGL 的文章顺序**继续学，但每学完一节，都把它放回完整渲染管线里：**它在哪 → 核心状态/API → GPU 在做什么 → 交互实验 → 工程延伸**。
+按 **LearnOpenGL** 的章节顺序记录学习进度。每一节都对应到渲染管线中的实际位置，并配合可交互 Lab 验证相关 OpenGL 状态和数据流。
 
 ![OpenGL Rendering Pipeline](static/rendering-pipeline.svg)
 
-> 这张图是学习用的简化管线。高亮节点表示当前章节；绿色节点表示已经学过并有对应交互章节。以后每学完一节继续扩展，而不是把 LearnOpenGL 原文重新抄一遍。
+> 高亮节点表示当前章节，绿色节点表示已经完成的章节。
 
 ## LearnOpenGL 学习顺序
 
@@ -18,9 +18,10 @@ description: 按 LearnOpenGL 的阅读顺序推进，同时用渲染管线地图
 [[learn/04-advanced-opengl/03-blending|03 · Blending 混合]]  
 [[learn/04-advanced-opengl/04-face-culling|04 · Face Culling 面剔除]]  
 [[learn/04-advanced-opengl/05-framebuffers|05 · Framebuffers 帧缓冲]]  
-[[learn/04-advanced-opengl/06-cubemaps|06 · Cubemaps 立方体贴图]]
+[[learn/04-advanced-opengl/06-cubemaps|06 · Cubemaps 立方体贴图]]  
+[[learn/04-advanced-opengl/07-advanced-data|07 · Advanced Data 高级数据]]
 
-当前重点：**Cubemap 不是新的 Pipeline Stage，而是一种被 Shader 采样的 Texture Resource。** 普通 `sampler2D` 用 `vec2 UV` 查颜色；`samplerCube` 用 `vec3 direction` 查环境。Skybox、Reflection、Refraction 都是在构造不同的采样方向。
+当前章节：**Advanced Data**。重点转到 Vertex Data 进入 Vertex Shader 之前的 Buffer 内存管理：分配、局部更新、属性布局和 Buffer 之间的复制。
 
 ## Interactive Labs
 
@@ -29,19 +30,21 @@ description: 按 LearnOpenGL 的阅读顺序推进，同时用渲染管线地图
 </form>
 
 <form action="/myOpengl-lab/static/labs/face-culling.html" method="get">
-  <button type="submit">🎮 Face Culling Lab · 官方 cube / marble</button>
+  <button type="submit">🎮 Face Culling Lab</button>
 </form>
 
 <form action="/myOpengl-lab/static/labs/framebuffers.html" method="get">
-  <button type="submit">🎮 Framebuffer Lab · 官方 container / metal + Post-processing</button>
+  <button type="submit">🎮 Framebuffer Lab</button>
 </form>
 
 <form action="/myOpengl-lab/static/labs/cubemaps.html" method="get">
-  <button type="submit">🎮 Cubemap / Skybox Lab · 官方 skybox + Reflection / Refraction</button>
+  <button type="submit">🎮 Cubemap / Skybox Lab</button>
 </form>
 
-每个 Lab 都尽量直接映射 OpenGL 状态机，而不是只做动画示意。独立 WebGL 页面采用完整页面加载，避免 Quartz SPA 干扰 WebGL 初始化。
+<form action="/myOpengl-lab/static/labs/advanced-data.html" method="get">
+  <button type="submit">🎮 Advanced Data Lab · Buffer Memory / Layout / Copy</button>
+</form>
 
 ## Notes
 
-[[notes/|Notes]] 是可选公开区。默认保持空白；你的主要笔记继续留在本地 Obsidian，需要公开哪一篇时再单独加。
+[[notes/|Notes]] 为公开笔记区；主要学习笔记保留在本地 Obsidian。
