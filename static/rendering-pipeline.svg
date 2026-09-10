@@ -1,33 +1,37 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="540" viewBox="0 0 1800 540" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1800" height="560" viewBox="0 0 1800 560" role="img" aria-labelledby="title desc">
   <title id="title">OpenGL Rendering Pipeline learning map</title>
-  <desc id="desc">Simplified OpenGL pipeline with Vertex Data and Buffer management highlighted for Advanced Data; Cubemap, Face Culling, Blending and Framebuffer are learned topics.</desc>
+  <desc id="desc">Advanced GLSL highlights shader interfaces, built-in variables and a Uniform Buffer Object shared by shader programs.</desc>
   <defs><style>
     .bg{fill:#0d1117}.box{fill:#161b22;stroke:#30363d;stroke-width:2}.learned{fill:#12241d;stroke:#3fb950;stroke-width:2.5}.current{fill:#0d2740;stroke:#58a6ff;stroke-width:3}.group{fill:#111820;stroke:#30363d;stroke-width:2;stroke-dasharray:7 7}.t{fill:#e6edf3;font:600 21px system-ui,-apple-system,"Segoe UI",sans-serif}.s{fill:#8b949e;font:15px system-ui,-apple-system,"Segoe UI",sans-serif}.ct{fill:#79c0ff;font:700 21px system-ui,-apple-system,"Segoe UI",sans-serif}.lt{fill:#56d364;font:700 19px system-ui,-apple-system,"Segoe UI",sans-serif}.line{stroke:#6e7681;stroke-width:3;fill:none}.dash{stroke:#58a6ff;stroke-width:2.5;stroke-dasharray:7 6;fill:none}.arrow{fill:#6e7681}.blueArrow{fill:#58a6ff}.tagCurrent{fill:#58a6ff;font:700 13px system-ui}.tagLearned{fill:#3fb950;font:700 12px system-ui}.note{fill:#79c0ff;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}
   </style><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="arrow"/></marker><marker id="barrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" class="blueArrow"/></marker></defs>
-  <rect class="bg" width="1800" height="540" rx="24"/>
-  <text x="50" y="52" class="t">OpenGL Rendering Pipeline · learning map</text><text x="50" y="80" class="s">Advanced Data focuses on Buffer memory before vertex attributes enter the Vertex Shader.</text>
+  <rect class="bg" width="1800" height="560" rx="24"/>
+  <text x="50" y="52" class="t">OpenGL Rendering Pipeline · learning map</text>
+  <text x="50" y="80" class="s">Advanced GLSL focuses on shader interfaces, built-in variables and shared uniform data.</text>
 
-  <rect x="40" y="154" width="220" height="114" rx="16" class="current"/><text x="150" y="193" text-anchor="middle" class="ct">Vertex Data</text><text x="150" y="222" text-anchor="middle" class="s">VAO / VBO / Buffer memory</text><text x="190" y="173" class="tagCurrent">CURRENT</text>
-  <path d="M260 211H300" class="line" marker-end="url(#arrow)"/><rect x="310" y="170" width="160" height="82" rx="14" class="box"/><text x="390" y="204" text-anchor="middle" class="t">Vertex Shader</text><text x="390" y="229" text-anchor="middle" class="s">attributes → clip position</text>
-  <path d="M470 211H505" class="line" marker-end="url(#arrow)"/><rect x="515" y="170" width="155" height="82" rx="14" class="box"/><text x="593" y="204" text-anchor="middle" class="t">Assembly</text><text x="593" y="229" text-anchor="middle" class="s">triangles</text>
-  <path d="M670 211H705" class="line" marker-end="url(#arrow)"/><rect x="715" y="164" width="185" height="94" rx="14" class="learned"/><text x="808" y="201" text-anchor="middle" class="lt">Face Culling</text><text x="808" y="227" text-anchor="middle" class="s">winding → drop triangle</text><text x="842" y="181" class="tagLearned">LEARNED</text>
-  <path d="M900 211H935" class="line" marker-end="url(#arrow)"/><rect x="945" y="170" width="165" height="82" rx="14" class="box"/><text x="1028" y="204" text-anchor="middle" class="t">Rasterization</text><text x="1028" y="229" text-anchor="middle" class="s">fragments</text>
-  <path d="M1110 211H1145" class="line" marker-end="url(#arrow)"/><rect x="1155" y="170" width="200" height="82" rx="14" class="box"/><text x="1255" y="204" text-anchor="middle" class="t">Fragment Shader</text><text x="1255" y="229" text-anchor="middle" class="s">texture sampling / src color</text>
+  <rect x="40" y="170" width="180" height="82" rx="14" class="learned"/><text x="130" y="204" text-anchor="middle" class="lt">Vertex Data</text><text x="130" y="229" text-anchor="middle" class="s">VAO / VBO</text><text x="158" y="187" class="tagLearned">LEARNED</text>
+  <path d="M220 211H260" class="line" marker-end="url(#arrow)"/>
 
-  <rect x="1145" y="304" width="225" height="105" rx="15" class="learned"/><text x="1258" y="341" text-anchor="middle" class="lt">Cubemap Texture</text><text x="1258" y="369" text-anchor="middle" class="s">samplerCube(direction vec3)</text><text x="1293" y="323" class="tagLearned">LEARNED</text>
-  <path d="M1258 304V266" class="line" marker-end="url(#arrow)"/>
+  <rect x="270" y="154" width="220" height="114" rx="16" class="current"/><text x="380" y="193" text-anchor="middle" class="ct">Vertex Shader</text><text x="380" y="221" text-anchor="middle" class="s">gl_Position · gl_VertexID</text><text x="380" y="245" text-anchor="middle" class="s">gl_PointSize</text><text x="420" y="173" class="tagCurrent">CURRENT</text>
+  <path d="M490 211H535" class="dash" marker-end="url(#barrow)"/>
+  <rect x="545" y="166" width="210" height="90" rx="14" class="current"/><text x="650" y="201" text-anchor="middle" class="ct">Shader Interface</text><text x="650" y="228" text-anchor="middle" class="s">out / in · Interface Block</text>
+  <path d="M755 211H800" class="line" marker-end="url(#arrow)"/>
+  <rect x="810" y="170" width="165" height="82" rx="14" class="box"/><text x="893" y="204" text-anchor="middle" class="t">Rasterization</text><text x="893" y="229" text-anchor="middle" class="s">interpolation</text>
+  <path d="M975 211H1020" class="line" marker-end="url(#arrow)"/>
+  <rect x="1030" y="154" width="240" height="114" rx="16" class="current"/><text x="1150" y="193" text-anchor="middle" class="ct">Fragment Shader</text><text x="1150" y="221" text-anchor="middle" class="s">gl_FragCoord · gl_FrontFacing</text><text x="1150" y="245" text-anchor="middle" class="s">gl_FragDepth</text>
+  <path d="M1270 211H1310V360H1320" class="line" marker-end="url(#arrow)"/>
+  <rect x="1320" y="302" width="390" height="120" rx="18" class="group"/><text x="1345" y="332" class="s">Per-sample operations</text>
+  <rect x="1345" y="350" width="105" height="48" rx="11" class="box"/><text x="1398" y="380" text-anchor="middle" class="s">Depth</text><path d="M1450 374H1480" class="line" marker-end="url(#arrow)"/>
+  <rect x="1490" y="343" width="140" height="62" rx="12" class="learned"/><text x="1560" y="378" text-anchor="middle" class="lt">Blending</text><text x="1574" y="360" class="tagLearned">LEARNED</text>
+  <path d="M1630 374H1652" class="line" marker-end="url(#arrow)"/>
+  <rect x="1660" y="337" width="90" height="74" rx="12" class="learned"/><text x="1705" y="370" text-anchor="middle" class="lt">FBO</text><text x="1705" y="393" text-anchor="middle" class="s">target</text>
 
-  <path d="M1355 211H1390V360H1395" class="line" marker-end="url(#arrow)"/>
-  <rect x="1395" y="302" width="360" height="120" rx="18" class="group"/><text x="1420" y="332" class="s">Per-sample operations</text>
-  <rect x="1420" y="350" width="105" height="48" rx="11" class="box"/><text x="1473" y="380" text-anchor="middle" class="s">Depth</text><path d="M1525 374H1552" class="line" marker-end="url(#arrow)"/>
-  <rect x="1562" y="343" width="140" height="62" rx="12" class="learned"/><text x="1632" y="378" text-anchor="middle" class="lt">Blending</text><text x="1648" y="360" class="tagLearned">LEARNED</text>
-  <path d="M1702 374H1720" class="line" marker-end="url(#arrow)"/>
-  <rect x="1725" y="337" width="65" height="74" rx="12" class="learned"/><text x="1757" y="369" text-anchor="middle" class="lt">FBO</text><text x="1757" y="391" text-anchor="middle" class="tagLearned">✓</text>
+  <rect x="285" y="330" width="520" height="120" rx="16" class="current"/><text x="310" y="360" class="ct">Uniform Buffer Object · GL_UNIFORM_BUFFER</text><text x="310" y="390" class="s">binding point 0 → shared by multiple shader programs</text><text x="310" y="418" class="note">Matrices { projection, view } · std140 layout</text>
+  <path d="M380 330V282" class="dash" marker-end="url(#barrow)"/>
+  <path d="M650 330V272" class="dash" marker-end="url(#barrow)"/>
 
-  <rect x="45" y="325" width="650" height="115" rx="15" class="group"/><text x="70" y="355" class="s">Advanced Data · Buffer operations</text>
-  <text x="70" y="388" class="note">glBufferData → allocate / replace storage   ·   glBufferSubData → update a byte range</text>
-  <text x="70" y="416" class="note">Interleaved vs Batched layout   ·   glCopyBufferSubData → Buffer-to-Buffer copy</text>
-  <path d="M150 325V282" class="dash" marker-end="url(#barrow)"/>
+  <rect x="850" y="330" width="350" height="110" rx="15" class="learned"/><text x="875" y="361" class="lt">Cubemap Texture</text><text x="875" y="390" class="s">samplerCube(direction vec3)</text><text x="875" y="417" class="s">shader resource</text><text x="1112" y="350" class="tagLearned">LEARNED</text>
+  <path d="M1110 330V282" class="line" marker-end="url(#arrow)"/>
 
-  <text x="70" y="493" class="s">The draw pipeline is unchanged. This chapter changes how vertex input memory is created, arranged, updated and copied.</text>
+  <text x="70" y="500" class="s">UBO is still a Buffer Object. The new part is how shared data is laid out and connected to shader programs.</text>
+  <text x="70" y="528" class="note">Built-ins connect shaders to fixed pipeline data; Interface Blocks organize stage-to-stage varyings; UBOs organize shared uniforms.</text>
 </svg>
