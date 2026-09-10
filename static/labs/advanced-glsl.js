@@ -38,10 +38,13 @@ void main(){gl_Position=vec4(0.0);}`;
 const stdProg=program(VS_STD,FS('.2,.5,.9'));
 const VS_DEPTH=`#version 300 es
 layout(location=0) in vec2 aPos;uniform float uZ;void main(){gl_Position=vec4(aPos,uZ,1.0);}`;
-const FS_DEPTH=`#version 300 es
-precision highp float;uniform vec3 uColor;uniform bool uWriteDepth;uniform float uDepth;out vec4 FragColor;
-void main(){if(uWriteDepth)gl_FragDepth=uDepth;FragColor=vec4(uColor,1.0);}`;
-const depthProg=program(VS_DEPTH,FS_DEPTH);
+const FS_DEPTH_DEFAULT=`#version 300 es
+precision highp float;uniform vec3 uColor;out vec4 FragColor;
+void main(){FragColor=vec4(uColor,1.0);}`;
+const FS_DEPTH_WRITE=`#version 300 es
+precision highp float;uniform vec3 uColor;uniform float uDepth;out vec4 FragColor;
+void main(){gl_FragDepth=uDepth;FragColor=vec4(uColor,1.0);}`;
+const depthDefaultProg=program(VS_DEPTH,FS_DEPTH_DEFAULT),depthWriteProg=program(VS_DEPTH,FS_DEPTH_WRITE);
 const cubeData=new Float32Array([
 -.5,-.5,-.5,.5,-.5,-.5,.5,.5,-.5,.5,.5,-.5,-.5,.5,-.5,-.5,-.5,-.5,
 -.5,-.5,.5,.5,.5,.5,.5,-.5,.5,.5,.5,.5,-.5,-.5,.5,-.5,.5,.5,
@@ -74,7 +77,8 @@ function drawFragCoord(){clear(false);gl.useProgram(fragCoordProg);gl.uniform2f(
 function drawFrontFacing(){clear(false);gl.useProgram(frontProg);gl.bindVertexArray(frontVAO);gl.drawArrays(gl.TRIANGLES,0,6)}
 function drawBuiltins(){const d=ui.builtinDemo.value;if(d==='point')drawPoints();else if(d==='fragcoord')drawFragCoord();else drawFrontFacing()}
 function drawStd(){clear(false);gl.useProgram(fragCoordProg);gl.uniform2f(gl.getUniformLocation(fragCoordProg,'uResolution'),canvas.width,canvas.height);gl.bindVertexArray(emptyVAO);gl.drawArrays(gl.TRIANGLES,0,3)}
-function drawDepth(){clear(true);gl.depthFunc(gl.LESS);gl.useProgram(depthProg);gl.bindVertexArray(depthVAO);const z=gl.getUniformLocation(depthProg,'uZ'),col=gl.getUniformLocation(depthProg,'uColor'),wd=gl.getUniformLocation(depthProg,'uWriteDepth'),dep=gl.getUniformLocation(depthProg,'uDepth');gl.uniform1f(z,.30);gl.uniform3f(col,.18,.42,.95);gl.uniform1i(wd,0);gl.drawArrays(gl.TRIANGLES,0,6);gl.uniform1f(z,-.30);gl.uniform3f(col,.95,.22,.18);gl.uniform1i(wd,ui.writeDepth.checked?1:0);gl.uniform1f(dep,+ui.manualDepth.value);gl.drawArrays(gl.TRIANGLES,0,6)}
+function drawDepthLayer(prog,zv,r,g,b,manual){gl.useProgram(prog);gl.uniform1f(gl.getUniformLocation(prog,'uZ'),zv);gl.uniform3f(gl.getUniformLocation(prog,'uColor'),r,g,b);if(manual)gl.uniform1f(gl.getUniformLocation(prog,'uDepth'),+ui.manualDepth.value);gl.drawArrays(gl.TRIANGLES,0,6)}
+function drawDepth(){clear(true);gl.depthFunc(gl.LESS);gl.bindVertexArray(depthVAO);drawDepthLayer(depthDefaultProg,.30,.18,.42,.95,false);if(ui.writeDepth.checked)drawDepthLayer(depthWriteProg,-.30,.95,.22,.18,true);else drawDepthLayer(depthDefaultProg,-.30,.95,.22,.18,false)}
 function queryStd140(){const names=['a','b','c','m','arr[0]'];const idx=gl.getUniformIndices(stdProg,names);const offsets=gl.getActiveUniforms(stdProg,idx,gl.UNIFORM_OFFSET);const strides=gl.getActiveUniforms(stdProg,idx,gl.UNIFORM_ARRAY_STRIDE);const block=gl.getUniformBlockIndex(stdProg,'DemoBlock');const size=gl.getActiveUniformBlockParameter(stdProg,block,gl.UNIFORM_BLOCK_DATA_SIZE);return{names,offsets:Array.from(offsets),strides:Array.from(strides),size}}
 const std=queryStd140();
 function buildStdUI(){ui.stdMemory.innerHTML='';const used=new Map();function mark(start,bytes,label){for(let b=start;b<start+bytes;b+=4)used.set(b,label)}mark(std.offsets[0],4,'a');mark(std.offsets[1],8,'b');mark(std.offsets[2],16,'c');mark(std.offsets[3],64,'m');const stride=std.strides[4]||16;for(let i=0;i<3;i++)mark(std.offsets[4]+i*stride,4,'arr'+i);for(let b=0;b<std.size;b+=4){const d=document.createElement('div');d.className='cell '+(used.has(b)?'used':'pad');d.textContent=used.get(b)||'·';d.title=`byte ${b}`;ui.stdMemory.appendChild(d)}ui.stdInfo.textContent=`Block size = ${std.size} bytes\na @ ${std.offsets[0]}\nb @ ${std.offsets[1]}\nc @ ${std.offsets[2]}\nm @ ${std.offsets[3]}\narr[0] @ ${std.offsets[4]}, array stride = ${stride}`}
@@ -86,7 +90,7 @@ function updateUI(){const m=ui.mode.value;ui.uboPanel.hidden=m!=='ubo';ui.builti
 if(m==='ubo'){ui.flow.textContent=`CPU\n  ↓ 1 个 Matrices UBO\n[ projection | view ]\n  ↓ binding point 0\nRed / Green / Yellow / ${blueShared?'Blue':'Blue(冻结在 binding 1)'}\n\nmodel 仍逐物体设置。`;ui.code.textContent=`layout(std140) uniform Matrices {\n  mat4 projection;\n  mat4 view;\n};\n\nglUniformBlockBinding(program, blockIndex, 0);\nglBindBufferBase(GL_UNIFORM_BUFFER, 0, uboMatrices);`}
 else if(m==='builtins'){const d=ui.builtinDemo.value;ui.pointControls.hidden=d!=='point';if(d==='point'){setActive(ui.bVertex,ui.bPoint);ui.builtinExplain.innerHTML='<b>左到右 5 个点就是 Vertex 0~4。</b> gl_VertexID 参与计算 gl_PointSize，所以编号越大的点越大。';ui.flow.textContent='Vertex 0..4\n  ↓ gl_VertexID\nVertex Shader 写 gl_PointSize\n  ↓\nGL_POINTS 以不同像素大小光栅化';ui.code.textContent=`gl_PointSize = base + float(gl_VertexID) * 4.0;`}else if(d==='fragcoord'){setActive(ui.bFrag);ui.builtinExplain.innerHTML='<b>整张屏幕就是坐标纸。</b> 每个 fragment 读取 gl_FragCoord.xy，右边 x 大，上面 y 大。';ui.flow.textContent='每个 fragment\n  ↓\ngl_FragCoord.xy = 窗口坐标\n  ↓\n用坐标直接生成颜色';ui.code.textContent=`vec2 uv = gl_FragCoord.xy / resolution;\nFragColor = vec4(uv.x, uv.y, .25, 1.0);`}else{setActive(ui.bFront);ui.builtinExplain.innerHTML='<b>两个三角形顶点绕序相反。</b> 不开启剔除时，gl_FrontFacing 仍能告诉 Fragment Shader 当前片段来自正面还是背面。';ui.flow.textContent='CCW triangle → gl_FrontFacing = true\nCW triangle  → gl_FrontFacing = false';ui.code.textContent=`FragColor = gl_FrontFacing ? green : red;`}}
 else if(m==='std140'){ui.flow.textContent='Uniform Block\n  ↓ std140 对齐规则\n成员被放进确定的 byte offset\n  ↓\nCPU 按这些 offset 写 UBO\n  ↓\nShader 才能正确读到';ui.code.textContent=`layout(std140) uniform DemoBlock {\n  float a;   // offset 0\n  vec2  b;   // offset 8\n  vec4  c;   // offset 16\n  mat4  m;   // offset 32\n  float arr[3]; // array stride 16\n};`}
-else{ui.flow.textContent=ui.writeDepth.checked?`蓝层先写 depth ≈ 0.65\n红层几何原本 depth ≈ 0.35\nFragment Shader 改写 → ${(+ui.manualDepth.value).toFixed(2)}\nGL_LESS 比较：${(+ui.manualDepth.value).toFixed(2)} < 0.65 ? ${+ui.manualDepth.value<.65?'PASS · 红色可见':'FAIL · 蓝色保留'}`:'蓝层先写 depth ≈ 0.65\n红层几何 depth ≈ 0.35\nGL_LESS：0.35 < 0.65 → PASS\n所以红色盖住蓝色';ui.code.textContent=`// Fragment Shader\nif (manualDepth)\n    gl_FragDepth = value;\n\n// 写 gl_FragDepth 会让驱动更难提前做 Early-Z。`}
+else{ui.flow.textContent=ui.writeDepth.checked?`蓝层先写 depth ≈ 0.65\n红层几何原本 depth ≈ 0.35\nFragment Shader 强制写 → ${(+ui.manualDepth.value).toFixed(2)}\nGL_LESS：${(+ui.manualDepth.value).toFixed(2)} < 0.65 ? ${+ui.manualDepth.value<.65?'PASS · 红色可见':'FAIL · 蓝色保留'}`:'蓝层先写 depth ≈ 0.65\n红层使用正常几何 depth ≈ 0.35\nGL_LESS：0.35 < 0.65 → PASS\n所以红色盖住蓝色';ui.code.textContent=ui.writeDepth.checked?`// 手动深度版本的 Fragment Shader\nvoid main(){\n    gl_FragDepth = value;\n    FragColor = red;\n}`:`// 默认版本完全不写 gl_FragDepth\nvoid main(){\n    FragColor = red;\n}`}
 updateStats()}
 ui.mode.onchange=updateUI;ui.builtinDemo.onchange=updateUI;ui.camX.oninput=()=>{dirty=true;updateUI()};ui.fov.oninput=()=>{dirty=true;updateUI()};ui.pointSize.oninput=updateUI;ui.breakBlue.onclick=freezeBlue;ui.restoreBlue.onclick=restoreBlue;ui.writeDepth.onchange=updateUI;ui.manualDepth.oninput=updateUI;writeBlock(frozenUBO,false);updateUI();requestAnimationFrame(draw);
 })();
