@@ -19,31 +19,19 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 [[learn/04-advanced-opengl/04-face-culling|04 · Face Culling 面剔除]]  
 [[learn/04-advanced-opengl/05-framebuffers|05 · Framebuffers 帧缓冲]]  
 [[learn/04-advanced-opengl/06-cubemaps|06 · Cubemaps 立方体贴图]]  
-[[learn/04-advanced-opengl/07-advanced-data|07 · Advanced Data 高级数据]]
+[[learn/04-advanced-opengl/07-advanced-data|07 · Advanced Data 高级数据]]  
+[[learn/04-advanced-opengl/08-advanced-glsl|08 · Advanced GLSL 高级 GLSL]]
 
-当前章节：**Advanced Data**。重点转到 Vertex Data 进入 Vertex Shader 之前的 Buffer 内存管理：分配、局部更新、属性布局和 Buffer 之间的复制。
+当前章节：**Advanced GLSL**。重点是 Shader 的数据接口：GLSL 内建变量、阶段间 Interface Block，以及让多个 Shader Program 共享数据的 Uniform Buffer Object。
 
 ## Interactive Labs
 
-<form action="/myOpengl-lab/static/labs/blending.html" method="get">
-  <button type="submit">🎮 Blending Lab</button>
-</form>
-
-<form action="/myOpengl-lab/static/labs/face-culling.html" method="get">
-  <button type="submit">🎮 Face Culling Lab</button>
-</form>
-
-<form action="/myOpengl-lab/static/labs/framebuffers.html" method="get">
-  <button type="submit">🎮 Framebuffer Lab</button>
-</form>
-
-<form action="/myOpengl-lab/static/labs/cubemaps.html" method="get">
-  <button type="submit">🎮 Cubemap / Skybox Lab</button>
-</form>
-
-<form action="/myOpengl-lab/static/labs/advanced-data.html" method="get">
-  <button type="submit">🎮 Advanced Data Lab · Buffer Memory / Layout / Copy</button>
-</form>
+<form action="/myOpengl-lab/static/labs/blending.html" method="get"><button type="submit">🎮 Blending Lab</button></form>
+<form action="/myOpengl-lab/static/labs/face-culling.html" method="get"><button type="submit">🎮 Face Culling Lab</button></form>
+<form action="/myOpengl-lab/static/labs/framebuffers.html" method="get"><button type="submit">🎮 Framebuffer Lab</button></form>
+<form action="/myOpengl-lab/static/labs/cubemaps.html" method="get"><button type="submit">🎮 Cubemap / Skybox Lab</button></form>
+<form action="/myOpengl-lab/static/labs/advanced-data.html" method="get"><button type="submit">🎮 Advanced Data Lab · Buffer Memory / Layout / Copy</button></form>
+<form action="/myOpengl-lab/static/labs/advanced-glsl.html" method="get"><button type="submit">🎮 Advanced GLSL Lab · Built-ins / Interface / UBO</button></form>
 
 ## Notes
 
