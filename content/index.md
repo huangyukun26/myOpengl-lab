@@ -20,9 +20,10 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 [[learn/04-advanced-opengl/05-framebuffers|05 · Framebuffers 帧缓冲]]  
 [[learn/04-advanced-opengl/06-cubemaps|06 · Cubemaps 立方体贴图]]  
 [[learn/04-advanced-opengl/07-advanced-data|07 · Advanced Data 高级数据]]  
-[[learn/04-advanced-opengl/08-advanced-glsl|08 · Advanced GLSL 高级 GLSL]]
+[[learn/04-advanced-opengl/08-advanced-glsl|08 · Advanced GLSL 高级 GLSL]]  
+[[learn/04-advanced-opengl/09-geometry-shader|09 · Geometry Shader 几何着色器]]
 
-当前章节：**Advanced GLSL**。重点是 Shader 的数据接口：GLSL 内建变量、阶段间 Interface Block，以及让多个 Shader Program 共享数据的 Uniform Buffer Object。
+当前章节：**Geometry Shader**。重点是 Vertex Shader 之后新增的可编程图元阶段：一次读取完整 point / line / triangle，再通过 `EmitVertex()` / `EndPrimitive()` 生成新的图元。
 
 ## Interactive Labs
 
@@ -32,6 +33,7 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 <form action="/myOpengl-lab/static/labs/cubemaps.html" method="get"><button type="submit">🎮 Cubemap / Skybox Lab</button></form>
 <form action="/myOpengl-lab/static/labs/advanced-data.html" method="get"><button type="submit">🎮 Advanced Data Lab · Buffer Memory / Layout / Copy</button></form>
 <form action="/myOpengl-lab/static/labs/advanced-glsl.html" method="get"><button type="submit">🎮 Advanced GLSL Lab · Built-ins / Interface / UBO</button></form>
+<form action="/myOpengl-lab/static/labs/geometry-shader.html" method="get"><button type="submit">🎮 Geometry Shader Lab · Primitive In / Primitive Out</button></form>
 
 ## Notes
 
