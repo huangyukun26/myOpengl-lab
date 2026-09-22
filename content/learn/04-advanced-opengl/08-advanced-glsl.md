@@ -12,6 +12,11 @@ tags:
 
 **LearnOpenGL 顺序：Advanced OpenGL → Advanced GLSL** · [原教程](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/08%20Advanced%20GLSL/)
 
+## 这一节在渲染管线中的位置
+
+<iframe src="https://huangyukun26.github.io/myOpengl-lab/static/labs/pipeline/08-advanced-glsl.html" title="OpenGL 08-advanced-glsl pipeline" style="width:100%;height:540px;border:0;border-radius:16px;display:block;"></iframe>
+
+
 这一节没有增加新的绘制阶段，而是在整理 **Shader 能从哪里拿数据、怎样把数据传给下一个 Shader、怎样让多个 Shader 共享同一批 uniform**。
 
 ## GLSL 内建变量：有些数据不用自己声明接口
