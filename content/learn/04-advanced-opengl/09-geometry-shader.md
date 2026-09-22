@@ -11,6 +11,11 @@ tags:
 
 **LearnOpenGL 顺序：Advanced OpenGL → Geometry Shader** · [原教程](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/09%20Geometry%20Shader/)
 
+## 这一节在渲染管线中的位置
+
+<iframe src="https://huangyukun26.github.io/myOpengl-lab/static/labs/pipeline/09-geometry-shader.html" title="OpenGL 09-geometry-shader pipeline" style="width:100%;height:520px;border:0;border-radius:16px;display:block;"></iframe>
+
+
 ## 它插在 Vertex Shader 和 Rasterization 中间
 
 以前可以把顶点阶段想成：
