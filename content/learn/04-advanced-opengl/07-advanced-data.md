@@ -12,6 +12,11 @@ tags:
 
 **LearnOpenGL 顺序：Advanced OpenGL → Advanced Data** · [原教程](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/07%20Advanced%20Data/)
 
+## 这一节在渲染管线中的位置
+
+<iframe src="https://huangyukun26.github.io/myOpengl-lab/static/labs/pipeline/07-advanced-data.html" title="OpenGL 07-advanced-data pipeline" style="width:100%;height:520px;border:0;border-radius:16px;display:block;"></iframe>
+
+
 ## Buffer Object 本质上是一块内存
 
 OpenGL 的 Buffer Object 可以先理解成一块由 GPU/驱动管理的连续内存。`GL_ARRAY_BUFFER`、`GL_ELEMENT_ARRAY_BUFFER` 等名字不是 Buffer 自己永久拥有的类型，而是它当前绑定到的 **Buffer Target**。Target 决定接下来的 API 怎样解释这块 Buffer。
