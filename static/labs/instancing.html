@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>OpenGL Instancing Lab</title>
+<style>
+:root{color-scheme:dark;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+*{box-sizing:border-box}[hidden]{display:none!important}
+body{margin:0;background:#0d1117;color:#e6edf3}
+main{max-width:1420px;margin:auto;padding:24px}
+h1{margin:0 0 6px;font-size:27px}.sub{color:#8b949e;line-height:1.7;margin-bottom:16px}
+.layout{display:grid;grid-template-columns:minmax(0,1.38fr) minmax(410px,.62fr);gap:16px}
+.card,.panel{background:#161b22;border:1px solid #30363d;border-radius:12px;padding:16px}
+.panel{background:#0d1117;margin-bottom:12px}.panel h3{margin:0 0 9px;font-size:14px}
+canvas{width:100%;aspect-ratio:16/10;display:block;background:#05070b;border:1px solid #30363d;border-radius:10px}
+.row{margin:11px 0}.rowline{display:flex;align-items:center;gap:10px;margin:9px 0}
+label{display:block;color:#8b949e;font-size:12px;margin-bottom:5px}
+select,input[type=range]{width:100%}select{background:#0d1117;color:#e6edf3;border:1px solid #30363d;border-radius:7px;padding:8px}
+input[type=checkbox]{accent-color:#58a6ff}
+.segment{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+button{background:#161b22;color:#c9d1d9;border:1px solid #30363d;border-radius:7px;padding:8px 9px;cursor:pointer}
+button.active{background:#0d2740;border-color:#58a6ff;color:#79c0ff}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.stat{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:9px;text-align:center}
+.stat b{display:block;font-size:14px}.stat span{font-size:10px;color:#8b949e}
+.flow,pre{font:11.5px/1.65 "SFMono-Regular",Consolas,monospace;background:#0d1117;border:1px solid #30363d;border-radius:9px;padding:11px;white-space:pre-wrap}
+.flow{margin-top:12px}.explain{font-size:12px;line-height:1.7;color:#8b949e}.explain b{color:#e6edf3}
+.pipeline{display:grid;grid-template-columns:1fr 28px 1fr 28px 1fr;align-items:center;gap:5px}
+.pbox{border:1px solid #30363d;border-radius:8px;padding:9px;text-align:center;font-size:11px}
+.pbox.current{border-color:#58a6ff;background:#0d2740}.arrow{text-align:center;color:#79c0ff}
+.badge{display:inline-block;border:1px solid #30363d;border-radius:999px;padding:3px 8px;color:#8b949e;font-size:11px;margin-right:5px}
+@media(max-width:930px){.layout{grid-template-columns:1fr}.pipeline{grid-template-columns:1fr}.arrow{transform:rotate(90deg)}}
+</style>
+</head>
+<body><main>
+<h1>OpenGL · Instancing Lab</h1>
+<div class="sub">同一份 Mesh，很多个 Instance。重点不是“复制顶点”，而是让 <b>per-vertex</b> 和 <b>per-instance</b> 数据以不同频率进入 Vertex Shader，并把大量重复 Draw Call 合并掉。</div>
+<div class="layout">
+<section class="card">
+<canvas id="glcanvas" width="1000" height="625"></canvas>
+<div class="stats">
+  <div class="stat"><b id="drawStat">—</b><span>Draw Calls</span></div>
+  <div class="stat"><b id="instanceStat">—</b><span>Instances</span></div>
+  <div class="stat"><b id="divisorStat">—</b><span>Instance Divisor</span></div>
+</div>
+<div id="flow" class="flow"></div>
+</section>
+<aside class="card">
+<div class="panel"><h3>实验</h3>
+<select id="mode">
+<option value="calls">A · Draw Calls：普通绘制 vs Instancing</option>
+<option value="instanceid">B · gl_InstanceID</option>
+<option value="divisor">C · Instanced Array / Divisor</option>
+<option value="asteroids">D · Asteroid Belt / mat4 Instance Attribute</option>
+</select></div>
+
+<div id="callsPanel" class="panel">
+<h3>A · 一次画一个，还是一次画很多个</h3>
+<div class="segment"><button id="normalDraw">普通绘制</button><button id="instancedDraw" class="active">Instanced</button></div>
+<div class="row"><label>Instance Count <span id="countText">100</span></label><input id="count" type="range" min="4" max="400" value="100" step="4"></div>
+<p class="explain">画面尽量保持一样，只改变 CPU 发出的绘制方式。普通方式循环调用 <code>drawArrays</code>；实例化方式只调用一次 <code>drawArraysInstanced</code>。</p>
+</div>
+
+<div id="instancePanel" class="panel" hidden>
+<h3>B · 每个实例都有自己的 gl_InstanceID</h3>
+<div class="row"><label>Instances <span id="idCountText">100</span></label><input id="idCount" type="range" min="1" max="100" value="100" step="1"></div>
+<div class="rowline"><input id="idScale" type="checkbox" checked><span>用 gl_InstanceID 控制缩放</span></div>
+<p class="explain">同一份 quad、同一个 Draw Call。Vertex Shader 里 <code>gl_InstanceID</code> 会从 0 开始随实例递增。</p>
+</div>
+
+<div id="divisorPanel" class="panel" hidden>
+<h3>C · Attribute 到底多久换一次</h3>
+<div class="row"><label>Divisor</label><select id="divisor"><option value="1">1 · 每个 instance 换一次</option><option value="2">2 · 每两个 instance 换一次</option><option value="4">4 · 每四个 instance 换一次</option></select></div>
+<p class="explain">颜色是 instanced attribute。把 divisor 从 1 改成 2 / 4，可以直接看到同一份 instance attribute 被几个实例共享。</p>
+</div>
+
+<div id="asteroidPanel" class="panel" hidden>
+<h3>D · 小行星带：mat4 作为实例属性</h3>
+<div class="row"><label>Asteroids <span id="rockText">1200</span></label><input id="rocks" type="range" min="100" max="4000" value="1200" step="100"></div>
+<div class="row"><label>Ring Radius <span id="radiusText">8.5</span></label><input id="radius" type="range" min="5" max="13" value="8.5" step="0.1"></div>
+<div class="rowline"><input id="rotate" type="checkbox" checked><span>旋转观察场景</span></div>
+<p class="explain">所有岩石共享一份低模 Mesh；每颗岩石只有自己的 Model Matrix。Matrix 被拆成 4 个 attribute location，并全部设置 divisor = 1。</p>
+</div>
+
+<div class="panel"><h3>数据节奏</h3>
+<div class="pipeline"><div class="pbox">Mesh VBO<br>per vertex</div><div class="arrow">+</div><div class="pbox current">Instance VBO<br>per instance</div><div class="arrow">→</div><div class="pbox">Vertex Shader</div></div>
+</div>
+<div class="panel"><h3>核心代码</h3><pre id="code"></pre></div>
+</aside>
+</div>
+<script src="instancing.js"></script>
+</main></body></html>
