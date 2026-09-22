@@ -21,7 +21,8 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 [[learn/04-advanced-opengl/06-cubemaps|06 · Cubemaps 立方体贴图]]  
 [[learn/04-advanced-opengl/07-advanced-data|07 · Advanced Data 高级数据]]  
 [[learn/04-advanced-opengl/08-advanced-glsl|08 · Advanced GLSL 高级 GLSL]]  
-[[learn/04-advanced-opengl/09-geometry-shader|09 · Geometry Shader 几何着色器]]  \n[[learn/04-advanced-opengl/10-instancing|10 · Instancing 实例化]]
+[[learn/04-advanced-opengl/09-geometry-shader|09 · Geometry Shader 几何着色器]]  
+[[learn/04-advanced-opengl/10-instancing|10 · Instancing 实例化]]
 
 当前章节：**Instancing**。重点是把大量共享同一份 Mesh 的物体合并到一次实例化 Draw Call，并用 `gl_InstanceID`、Instanced Array 和 `glVertexAttribDivisor` 提供逐实例数据。
 
@@ -33,7 +34,8 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 <form action="/myOpengl-lab/static/labs/cubemaps.html" method="get"><button type="submit">🎮 Cubemap / Skybox Lab</button></form>
 <form action="/myOpengl-lab/static/labs/advanced-data.html" method="get"><button type="submit">🎮 Advanced Data Lab · Buffer Memory / Layout / Copy</button></form>
 <form action="/myOpengl-lab/static/labs/advanced-glsl.html" method="get"><button type="submit">🎮 Advanced GLSL Lab · Built-ins / Interface / UBO</button></form>
-<form action="/myOpengl-lab/static/labs/geometry-shader.html" method="get"><button type="submit">🎮 Geometry Shader Lab · Primitive In / Primitive Out</button></form>\n<form action="/myOpengl-lab/static/labs/instancing.html" method="get"><button type="submit">🎮 Instancing Lab · Draw Calls / Divisor / Asteroid Belt</button></form>
+<form action="/myOpengl-lab/static/labs/geometry-shader.html" method="get"><button type="submit">🎮 Geometry Shader Lab · Primitive In / Primitive Out</button></form>
+<form action="/myOpengl-lab/static/labs/instancing.html" method="get"><button type="submit">🎮 Instancing Lab · Draw Calls / Divisor / Asteroid Belt</button></form>
 
 ## Notes
 
