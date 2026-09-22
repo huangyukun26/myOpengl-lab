@@ -11,6 +11,11 @@ tags:
 
 **LearnOpenGL 顺序：Advanced OpenGL → Blending**
 
+## 这一节在渲染管线中的位置
+
+<iframe src="https://huangyukun26.github.io/myOpengl-lab/static/labs/pipeline/03-blending.html" title="OpenGL 03-blending pipeline" style="width:100%;height:520px;border:0;border-radius:16px;display:block;"></iframe>
+
+
 ## 在管线哪里
 
 `Fragment Shader → per-sample operations → Blending → Color Buffer`
