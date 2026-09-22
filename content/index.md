@@ -7,9 +7,11 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 
 按 **LearnOpenGL** 的章节顺序记录学习进度。每一节都对应到渲染管线中的实际位置，并配合可交互 Lab 验证相关 OpenGL 状态和数据流。
 
-![OpenGL Rendering Pipeline](static/rendering-pipeline.svg)
+<div style="margin:1rem 0 1.25rem;">
+  <iframe src="/myOpengl-lab/static/pipeline-map.html" title="Advanced OpenGL 互动渲染管线地图" style="width:100%;height:760px;border:0;border-radius:16px;display:block;"></iframe>
+</div>
 
-> 高亮节点表示当前章节，绿色节点表示已经完成的章节。
+> 点击 03–10 的章节标签，可以查看各章节在渲染管线中的实际位置与相关数据关系。
 
 ## LearnOpenGL 学习顺序
 
