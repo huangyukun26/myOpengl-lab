@@ -29,13 +29,18 @@ body{margin:0;background:transparent;color:var(--text);font-family:Inter,ui-sans
 .stage.hot{border-color:var(--active);background:color-mix(in srgb,var(--active) 10%,var(--card));box-shadow:inset 0 0 0 1px var(--active)}
 .stage.hot::after{content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:3px;border-radius:2px;background:var(--active)}
 .arrow{text-align:center;color:var(--line);font-size:24px}
-.branches{min-width:1462px;display:grid;grid-template-columns:136px 38px 150px 38px 150px 38px 160px 38px 150px 38px 150px 38px 150px 38px 150px;margin-top:18px}
-.branch{border:1px solid var(--border);background:var(--card);border-radius:13px;padding:11px 12px;min-height:74px;transition:.18s ease}
-.branch b{font-size:13px}.branch p{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.45}
-.branch.hot{border-color:var(--active);background:color-mix(in srgb,var(--active) 10%,var(--card));box-shadow:inset 0 0 0 1px var(--active)}
-#instanceBranch{grid-column:1/5}
-#resourceBranch{grid-column:5/10}
-#fboBranch{grid-column:10/14}
+.relations{min-width:1462px;display:grid;grid-template-columns:136px 38px 150px 38px 150px 38px 160px 38px 150px 38px 150px 38px 150px 38px 150px;grid-template-rows:30px auto;align-items:start;margin-top:2px}
+.relation{position:relative;display:flex;flex-direction:column;align-items:stretch}
+.relation::before{content:"";width:2px;height:28px;background:var(--border);margin:0 auto;border-radius:2px}
+.relation::after{content:"";position:absolute;top:0;left:50%;width:10px;height:10px;border-left:2px solid var(--border);border-top:2px solid var(--border);transform:translate(-50%,-1px) rotate(45deg)}
+.relation.hot::before,.relation.hot::after{background:var(--active);border-color:var(--active)}
+.branch{border:1px solid var(--border);background:var(--card);border-radius:13px;padding:12px 14px;min-height:78px;transition:.18s ease}
+.branch b{font-size:13px}.branch p{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.5}
+.relation.hot .branch{border-color:var(--active);background:color-mix(in srgb,var(--active) 10%,var(--card));box-shadow:inset 0 0 0 1px var(--active)}
+#instanceRelation{grid-column:1/6;grid-row:1/3}
+#resourceRelation{grid-column:5/13;grid-row:1/3}
+#fboRelation{grid-column:13/16;grid-row:1/3}
+.relationLabel{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
 .info{margin-top:14px;border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:16px}
 .infoTop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
 .badge{font-size:12px;border:1px solid var(--active);color:var(--active);padding:4px 8px;border-radius:999px}
@@ -76,16 +81,34 @@ body{margin:0;background:transparent;color:var(--text);font-family:Inter,ui-sans
         <div class="stage" data-stage="output"><b>Per-Sample</b><span>Depth / Stencil<br>Blending</span></div>
       </div>
 
-      <div class="branches">
-        <div class="branch" id="instanceBranch" data-stage="instance"><b>Instance Data</b><p>offset / color / model matrix · glVertexAttribDivisor</p></div>
-        <div class="branch" id="resourceBranch" data-stage="resource"><b>Shader Data / Resource</b><p>UBO · Interface Block · Cubemap · Texture</p></div>
-        <div class="branch" id="fboBranch" data-stage="framebuffer"><b>Framebuffer / FBO</b><p>颜色附件 · 深度附件 · 后处理输入</p></div>
+      <div class="relations">
+        <div class="relation" id="instanceRelation" data-stage="instance">
+          <div class="branch">
+            <div class="relationLabel">feeds Vertex Input / Vertex Shader</div>
+            <b>Instance Data</b>
+            <p>offset / color / model matrix · glVertexAttribDivisor</p>
+          </div>
+        </div>
+        <div class="relation" id="resourceRelation" data-stage="resource">
+          <div class="branch">
+            <div class="relationLabel">used by Shader Stages</div>
+            <b>Shader Data / Resource</b>
+            <p>UBO · Interface Block · Cubemap · Texture</p>
+          </div>
+        </div>
+        <div class="relation" id="fboRelation" data-stage="framebuffer">
+          <div class="branch">
+            <div class="relationLabel">render target / next-pass input</div>
+            <b>Framebuffer / FBO</b>
+            <p>颜色附件 · 深度附件 · 后处理输入</p>
+          </div>
+        </div>
       </div>
     </div>
 
     <div class="legend">
-      <span>主线：真正的渲染阶段</span>
-      <span>下方：输入数据、Shader 资源和渲染目标</span>
+      <span>上方主线：渲染阶段</span>
+      <span>下方连线：数据 / 资源 / 渲染目标与主线的关联</span>
     </div>
   </section>
 
