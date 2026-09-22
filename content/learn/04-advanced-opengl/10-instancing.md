@@ -11,6 +11,11 @@ tags:
 
 **LearnOpenGL 顺序：Advanced OpenGL → Instancing** · [原教程](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/10%20Instancing/)
 
+## 这一节在渲染管线中的位置
+
+<iframe src="https://huangyukun26.github.io/myOpengl-lab/static/labs/pipeline/10-instancing.html" title="OpenGL 10-instancing pipeline" style="width:100%;height:540px;border:0;border-radius:16px;display:block;"></iframe>
+
+
 实例化解决的不是“GPU 不会画很多三角形”，而是另一件事：
 
 > **当很多物体共享同一份 Mesh 时，不要让 CPU 为每个物体重复发一次 Draw Call。**
