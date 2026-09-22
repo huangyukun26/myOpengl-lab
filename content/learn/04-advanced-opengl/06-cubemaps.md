@@ -13,6 +13,11 @@ tags:
 
 **LearnOpenGL 顺序：Advanced OpenGL → Cubemaps**  ·  [原教程](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/06%20Cubemaps/)
 
+## 这一节在渲染管线中的位置
+
+<iframe src="https://huangyukun26.github.io/myOpengl-lab/static/labs/pipeline/06-cubemaps.html" title="OpenGL 06-cubemaps pipeline" style="width:100%;height:520px;border:0;border-radius:16px;display:block;"></iframe>
+
+
 ## 先抓住唯一的新东西
 
 普通 2D Texture：
