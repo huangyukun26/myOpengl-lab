@@ -3,39 +3,91 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Advanced OpenGL Pipeline Overview</title>
 <style>
-:root{color-scheme:light dark;--panel:#fff;--card:#f7f9fc;--text:#172033;--muted:#697386;--border:#d8e0ea;--line:#aab6c7}
-@media(prefers-color-scheme:dark){:root{--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49;--line:#596679}}
-*{box-sizing:border-box}body{margin:0;background:transparent;color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-.wrap{max-width:1180px;margin:auto;padding:4px}.card{border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:16px}
-.title{font-size:13px;font-weight:700;margin-bottom:12px}.pipeline{display:grid;grid-template-columns:repeat(17,max-content);align-items:center;gap:7px;overflow-x:auto;padding-bottom:7px}
-.stage{width:116px;min-height:88px;border:1px solid var(--border);background:var(--card);border-radius:12px;padding:10px 8px;display:flex;flex-direction:column;justify-content:center;text-align:center}
-.stage b{font-size:13px;line-height:1.25}.stage span{font-size:10.5px;color:var(--muted);line-height:1.4;margin-top:6px}.arr{color:var(--line);font-size:18px}
-.links{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
-.links a{border:1px solid var(--border);background:var(--card);border-radius:10px;padding:9px 10px;text-decoration:none;color:var(--text);font-size:12px;text-align:center}
-.links a:hover{border-color:#7a8797}.note{margin-top:10px;color:var(--muted);font-size:11px;line-height:1.5}
-@media(max-width:720px){.links{grid-template-columns:repeat(2,minmax(0,1fr))}}
-</style></head><body><div class="wrap"><section class="card">
+:root{
+  color-scheme:light dark;
+  --panel:#ffffff;--card:#f7f9fc;--text:#172033;--muted:#697386;--border:#d8e0ea;--line:#aab6c7;
+  --s1:#3f8cff;--s2:#39a96b;--s3:#8b63d7;--s4:#e79a34;--s5:#d65caa;--s6:#e85d67;--s7:#1ba8b7;--s8:#c39a2d;
+}
+@media(prefers-color-scheme:dark){
+  :root{--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49;--line:#596679}
+}
+*{box-sizing:border-box}
+body{margin:0;background:transparent;color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:4px}
+.card{border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:16px}
+.title{font-size:13px;font-weight:700;margin-bottom:12px}
+.pipeline{display:grid;grid-template-columns:repeat(17,max-content);align-items:center;gap:7px;overflow-x:auto;padding-bottom:7px}
+.stage{width:116px;min-height:88px;border:1px solid var(--border);background:var(--card);border-radius:12px;padding:10px 8px;display:flex;flex-direction:column;justify-content:center;text-align:center;position:relative;overflow:hidden}
+.stage::before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:var(--stage)}
+.stage b{font-size:13px;line-height:1.25}.stage span{font-size:10.5px;color:var(--muted);line-height:1.4;margin-top:6px}
+.arr{color:var(--line);font-size:18px}
+.chapters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
+.chapter{border:1px solid var(--border);background:var(--card);border-radius:10px;padding:10px 11px;color:var(--text);font-size:12px;text-align:left;cursor:pointer;display:flex;align-items:center;gap:8px;min-height:42px}
+.chapter:hover{border-color:var(--chapter)}
+.chapter .dot{width:9px;height:9px;border-radius:50%;background:var(--chapter);flex:none}
+.chapter strong{font-weight:650}
+dialog{width:min(1080px,96%);height:min(620px,78%);border:1px solid var(--border);border-radius:16px;padding:0;background:var(--panel);color:var(--text)}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+.modalHead{height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 14px;border-bottom:1px solid var(--border)}
+.modalTitle{font-size:14px;font-weight:700}
+.close{border:1px solid var(--border);background:var(--card);color:var(--text);border-radius:8px;width:34px;height:34px;cursor:pointer;font-size:18px}
+.modalBody{height:calc(100% - 54px)}
+.modalBody iframe{width:100%;height:100%;border:0;display:block;background:transparent}
+@media(max-width:720px){.chapters{grid-template-columns:repeat(2,minmax(0,1fr))}dialog{height:82%}}
+</style></head>
+<body><div class="wrap"><section class="card">
 <div class="title">Advanced OpenGL · 完整渲染管线</div>
 <div class="pipeline">
-<div class="stage"><b>CPU / Draw</b><span>数据准备 · 绘制命令</span></div><div class="arr">→</div>
-<div class="stage"><b>Vertex Input</b><span>VAO · VBO · Attribute</span></div><div class="arr">→</div>
-<div class="stage"><b>Vertex Shader</b><span>逐顶点处理</span></div><div class="arr">→</div>
-<div class="stage"><b>Primitive Assembly</b><span>组装图元</span></div><div class="arr">→</div>
-<div class="stage"><b>Geometry Shader</b><span>可选 · 按图元处理</span></div><div class="arr">→</div>
-<div class="stage"><b>Rasterization</b><span>图元 → fragments</span></div><div class="arr">→</div>
-<div class="stage"><b>Fragment Shader</b><span>颜色 / 深度 / 采样</span></div><div class="arr">→</div>
-<div class="stage"><b>Per-Sample</b><span>Depth · Stencil · Blending</span></div><div class="arr">→</div>
-<div class="stage"><b>Framebuffer</b><span>颜色 / 深度附件</span></div>
+<div class="stage" style="--stage:var(--s1)"><b>CPU / Draw</b><span>数据准备 · 绘制命令</span></div><div class="arr">→</div>
+<div class="stage" style="--stage:var(--s2)"><b>Vertex Input</b><span>VAO · VBO · Attribute</span></div><div class="arr">→</div>
+<div class="stage" style="--stage:var(--s3)"><b>Vertex Shader</b><span>逐顶点处理</span></div><div class="arr">→</div>
+<div class="stage" style="--stage:var(--s4)"><b>Primitive Assembly</b><span>组装图元</span></div><div class="arr">→</div>
+<div class="stage" style="--stage:var(--s5)"><b>Geometry Shader</b><span>可选 · 按图元处理</span></div><div class="arr">→</div>
+<div class="stage" style="--stage:var(--s6)"><b>Rasterization</b><span>图元 → fragments</span></div><div class="arr">→</div>
+<div class="stage" style="--stage:var(--s7)"><b>Fragment Shader</b><span>颜色 / 深度 / 采样</span></div><div class="arr">→</div>
+<div class="stage" style="--stage:var(--s8)"><b>Per-Sample</b><span>Depth · Stencil · Blending</span></div><div class="arr">→</div>
+<div class="stage" style="--stage:var(--s1)"><b>Framebuffer</b><span>颜色 / 深度附件</span></div>
 </div>
-<div class="links">
-<a target="_top" href="/myOpengl-lab/static/labs/pipeline/03-blending.html">03 · Blending</a>
-<a target="_top" href="/myOpengl-lab/static/labs/pipeline/04-face-culling.html">04 · Face Culling</a>
-<a target="_top" href="/myOpengl-lab/static/labs/pipeline/05-framebuffers.html">05 · Framebuffers</a>
-<a target="_top" href="/myOpengl-lab/static/labs/pipeline/06-cubemaps.html">06 · Cubemaps</a>
-<a target="_top" href="/myOpengl-lab/static/labs/pipeline/07-advanced-data.html">07 · Advanced Data</a>
-<a target="_top" href="/myOpengl-lab/static/labs/pipeline/08-advanced-glsl.html">08 · Advanced GLSL</a>
-<a target="_top" href="/myOpengl-lab/static/labs/pipeline/09-geometry-shader.html">09 · Geometry Shader</a>
-<a target="_top" href="/myOpengl-lab/static/labs/pipeline/10-instancing.html">10 · Instancing</a>
+
+<div class="chapters">
+<button class="chapter" data-slug="03-blending" data-title="03 · Blending 混合" style="--chapter:#e85d67"><span class="dot"></span><strong>03 · Blending</strong></button>
+<button class="chapter" data-slug="04-face-culling" data-title="04 · Face Culling 面剔除" style="--chapter:#e79a34"><span class="dot"></span><strong>04 · Face Culling</strong></button>
+<button class="chapter" data-slug="05-framebuffers" data-title="05 · Framebuffers 帧缓冲" style="--chapter:#4388e8"><span class="dot"></span><strong>05 · Framebuffers</strong></button>
+<button class="chapter" data-slug="06-cubemaps" data-title="06 · Cubemaps 立方体贴图" style="--chapter:#d65caa"><span class="dot"></span><strong>06 · Cubemaps</strong></button>
+<button class="chapter" data-slug="07-advanced-data" data-title="07 · Advanced Data 高级数据" style="--chapter:#41a96b"><span class="dot"></span><strong>07 · Advanced Data</strong></button>
+<button class="chapter" data-slug="08-advanced-glsl" data-title="08 · Advanced GLSL 高级 GLSL" style="--chapter:#c39a2d"><span class="dot"></span><strong>08 · Advanced GLSL</strong></button>
+<button class="chapter" data-slug="09-geometry-shader" data-title="09 · Geometry Shader 几何着色器" style="--chapter:#8b63d7"><span class="dot"></span><strong>09 · Geometry Shader</strong></button>
+<button class="chapter" data-slug="10-instancing" data-title="10 · Instancing 实例化" style="--chapter:#1ba8b7"><span class="dot"></span><strong>10 · Instancing</strong></button>
 </div>
-<div class="note">首页只保留完整管线骨架；每个章节页面只强调与该章节有关的部分。</div>
-</section></div></body></html>
+</section>
+
+<dialog id="detailDialog">
+  <div class="modalHead">
+    <div id="modalTitle" class="modalTitle"></div>
+    <button id="closeBtn" class="close" type="button" aria-label="关闭">×</button>
+  </div>
+  <div class="modalBody">
+    <iframe id="detailFrame" title="章节管线详情"></iframe>
+  </div>
+</dialog>
+</div>
+
+<script>
+(()=>{
+  const dialog=document.getElementById('detailDialog');
+  const frame=document.getElementById('detailFrame');
+  const title=document.getElementById('modalTitle');
+  const close=document.getElementById('closeBtn');
+  document.querySelectorAll('.chapter').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      title.textContent=btn.dataset.title;
+      frame.src='/myOpengl-lab/static/labs/pipeline/'+btn.dataset.slug+'.html';
+      dialog.showModal();
+    });
+  });
+  close.addEventListener('click',()=>dialog.close());
+  dialog.addEventListener('click',e=>{if(e.target===dialog) dialog.close();});
+  dialog.addEventListener('close',()=>{frame.src='';});
+})();
+</script>
+</body></html>
