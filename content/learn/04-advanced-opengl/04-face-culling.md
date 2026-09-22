@@ -11,6 +11,11 @@ tags:
 
 **LearnOpenGL 顺序：Advanced OpenGL → Face Culling**  ·  [原教程](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/04%20Face%20culling/)
 
+## 这一节在渲染管线中的位置
+
+<iframe src="https://huangyukun26.github.io/myOpengl-lab/static/labs/pipeline/04-face-culling.html" title="OpenGL 04-face-culling pipeline" style="width:100%;height:520px;border:0;border-radius:16px;display:block;"></iframe>
+
+
 ## 在管线哪里
 
 `Vertex Shader → Primitive Assembly → Face Culling → Rasterization → Fragment Shader`
