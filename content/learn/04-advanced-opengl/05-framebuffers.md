@@ -12,6 +12,11 @@ tags:
 
 **LearnOpenGL 顺序：Advanced OpenGL → Framebuffers** · [原教程](https://learnopengl-cn.github.io/04%20Advanced%20OpenGL/05%20Framebuffers/)
 
+## 这一节在渲染管线中的位置
+
+<iframe src="https://huangyukun26.github.io/myOpengl-lab/static/labs/pipeline/05-framebuffers.html" title="OpenGL 05-framebuffers pipeline" style="width:100%;height:540px;border:0;border-radius:16px;display:block;"></iframe>
+
+
 ## 在管线哪里
 
 `... → Fragment Shader → Depth / Stencil / Blending → 当前绑定的 Framebuffer attachments`
