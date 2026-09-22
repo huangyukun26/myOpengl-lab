@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Advanced OpenGL Pipeline Map</title>
+<style>
+:root{
+  color-scheme:light dark;
+  --bg:#f8fafc;--panel:#ffffff;--card:#f8fafc;--text:#152033;--muted:#667085;--border:#d9e0ea;--line:#aeb9c8;
+  --c03:#e85d67;--c04:#e79a34;--c05:#4388e8;--c06:#d65caa;--c07:#41a96b;--c08:#c39a2d;--c09:#8b63d7;--c10:#1ba8b7;
+}
+@media(prefers-color-scheme:dark){
+  :root{--bg:#0d1117;--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#95a1b2;--border:#2d3745;--line:#566273}
+}
+*{box-sizing:border-box}
+body{margin:0;background:transparent;color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.app{max-width:1180px;margin:0 auto;padding:4px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.topic{appearance:none;border:1px solid var(--border);background:var(--panel);color:var(--text);padding:9px 12px;border-radius:10px;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:7px;min-height:40px}
+.topic:hover{border-color:color-mix(in srgb,var(--topic) 65%,var(--border))}
+.topic.active{border-color:var(--topic);box-shadow:inset 0 0 0 1px var(--topic);background:color-mix(in srgb,var(--topic) 8%,var(--panel))}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--topic);flex:none}
+.map{border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:16px;overflow:hidden}
+.scroller{overflow-x:auto;padding-bottom:4px}
+.pipeline{min-width:1040px;display:grid;grid-template-columns:136px 38px 150px 38px 150px 38px 160px 38px 150px 38px 150px 38px 136px;align-items:center}
+.stage{height:112px;border:1px solid var(--border);background:var(--card);border-radius:14px;padding:13px 10px;display:flex;flex-direction:column;justify-content:center;text-align:center;transition:.18s ease;position:relative}
+.stage b{font-size:15px;line-height:1.25}.stage span{font-size:12px;color:var(--muted);line-height:1.45;margin-top:8px}
+.stage.hot{border-color:var(--active);background:color-mix(in srgb,var(--active) 10%,var(--card));box-shadow:inset 0 0 0 1px var(--active)}
+.stage.hot::after{content:"";position:absolute;left:16px;right:16px;bottom:-1px;height:3px;border-radius:2px;background:var(--active)}
+.arrow{text-align:center;color:var(--line);font-size:24px}
+.branches{min-width:1040px;display:grid;grid-template-columns:136px 38px 150px 38px 150px 38px 160px 38px 150px 38px 150px 38px 136px;margin-top:18px}
+.branch{border:1px solid var(--border);background:var(--card);border-radius:13px;padding:11px 12px;min-height:74px;transition:.18s ease}
+.branch b{font-size:13px}.branch p{font-size:12px;color:var(--muted);margin:6px 0 0;line-height:1.45}
+.branch.hot{border-color:var(--active);background:color-mix(in srgb,var(--active) 10%,var(--card));box-shadow:inset 0 0 0 1px var(--active)}
+#instanceBranch{grid-column:1/5}
+#resourceBranch{grid-column:5/10}
+#fboBranch{grid-column:10/14}
+.info{margin-top:14px;border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:16px}
+.infoTop{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
+.badge{font-size:12px;border:1px solid var(--active);color:var(--active);padding:4px 8px;border-radius:999px}
+.info h2{font-size:18px;margin:0}
+.path{font-family:"SFMono-Regular",Consolas,monospace;font-size:12px;color:var(--muted);background:var(--card);border:1px solid var(--border);border-radius:9px;padding:9px 10px;margin:10px 0}
+.info h3{font-size:14px;margin:14px 0 6px}
+.info p{font-size:13.5px;line-height:1.75;color:var(--muted);margin:0}
+.legend{display:flex;gap:12px;flex-wrap:wrap;margin-top:10px;color:var(--muted);font-size:11px}
+.legend span{display:flex;align-items:center;gap:5px}
+@media(max-width:640px){
+  .map{padding:12px}.info{padding:14px}.topic{padding:8px 10px;font-size:12px}.info h2{font-size:16px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="toolbar" aria-label="章节选择">
+    <button class="topic" data-id="03" style="--topic:var(--c03)"><i class="dot"></i>03 混合</button>
+    <button class="topic" data-id="04" style="--topic:var(--c04)"><i class="dot"></i>04 面剔除</button>
+    <button class="topic" data-id="05" style="--topic:var(--c05)"><i class="dot"></i>05 帧缓冲</button>
+    <button class="topic" data-id="06" style="--topic:var(--c06)"><i class="dot"></i>06 Cubemaps</button>
+    <button class="topic" data-id="07" style="--topic:var(--c07)"><i class="dot"></i>07 高级数据</button>
+    <button class="topic" data-id="08" style="--topic:var(--c08)"><i class="dot"></i>08 高级 GLSL</button>
+    <button class="topic" data-id="09" style="--topic:var(--c09)"><i class="dot"></i>09 几何着色器</button>
+    <button class="topic" data-id="10" style="--topic:var(--c10)"><i class="dot"></i>10 实例化</button>
+  </div>
+
+  <section class="map">
+    <div class="scroller">
+      <div class="pipeline">
+        <div class="stage" data-stage="cpu"><b>CPU / Draw</b><span>数据准备<br>绘制命令</span></div><div class="arrow">→</div>
+        <div class="stage" data-stage="vertexInput"><b>Vertex Input</b><span>VAO / VBO<br>Vertex Attribute</span></div><div class="arrow">→</div>
+        <div class="stage" data-stage="vertex"><b>Vertex Shader</b><span>逐顶点处理<br>gl_InstanceID</span></div><div class="arrow">→</div>
+        <div class="stage" data-stage="assembly"><b>Primitive Assembly</b><span>point / line / triangle</span></div><div class="arrow">→</div>
+        <div class="stage" data-stage="geometry"><b>Geometry Shader</b><span>完整图元<br>可选阶段</span></div><div class="arrow">→</div>
+        <div class="stage" data-stage="raster"><b>Rasterization</b><span>图元 → fragments</span></div><div class="arrow">→</div>
+        <div class="stage" data-stage="fragment"><b>Fragment Shader</b><span>纹理 / 光照<br>颜色 / 深度</span></div><div class="arrow">→</div>
+        <div class="stage" data-stage="output"><b>Per-Sample</b><span>Depth / Stencil<br>Blending</span></div>
+      </div>
+
+      <div class="branches">
+        <div class="branch" id="instanceBranch" data-stage="instance"><b>Instance Data</b><p>offset / color / model matrix · glVertexAttribDivisor</p></div>
+        <div class="branch" id="resourceBranch" data-stage="resource"><b>Shader Data / Resource</b><p>UBO · Interface Block · Cubemap · Texture</p></div>
+        <div class="branch" id="fboBranch" data-stage="framebuffer"><b>Framebuffer / FBO</b><p>颜色附件 · 深度附件 · 后处理输入</p></div>
+      </div>
+    </div>
+
+    <div class="legend">
+      <span>主线：真正的渲染阶段</span>
+      <span>下方：输入数据、Shader 资源和渲染目标</span>
+    </div>
+  </section>
+
+  <section class="info">
+    <div class="infoTop"><span id="badge" class="badge"></span><h2 id="title"></h2></div>
+    <div id="path" class="path"></div>
+    <h3>相关理解</h3>
+    <p id="summary"></p>
+  </section>
+</div>
+<script>
+(()=>{
+  const data={
+    "03":{color:"var(--c03)",title:"03 · Blending 混合",badge:"输出阶段",stages:["fragment","output"],path:"Fragment Shader → Per-Sample / Output",summary:"Fragment Shader 先计算当前片段准备写出的颜色，Blending 再根据 src / dst 混合因子，把它和颜色缓冲中已经存在的颜色组合。它不属于 Shader Stage，也不会改变几何，只影响片段最终如何写入颜色缓冲。"},
+    "04":{color:"var(--c04)",title:"04 · Face Culling 面剔除",badge:"图元处理",stages:["assembly","raster"],path:"Primitive Assembly → Face Culling → Rasterization",summary:"面剔除处理的是已经组装好的三角形。OpenGL 根据顶点绕序判断正面和背面，把不需要的整张三角形在光栅化之前丢弃，因此被剔除的面根本不会继续生成 Fragment。"},
+    "05":{color:"var(--c05)",title:"05 · Framebuffers 帧缓冲",badge:"渲染目标",stages:["fragment","output","framebuffer","resource"],path:"Fragment / Per-Sample → Framebuffer → 可再次作为 Texture 输入",summary:"Framebuffer 决定一次渲染的结果写到哪里。默认帧缓冲最终显示到屏幕，而自定义 FBO 可以把颜色或深度写进纹理 / Renderbuffer。这样第一遍渲染的输出就能成为第二遍渲染的输入，这正是后处理、后视镜、离屏渲染等效果的基础。"},
+    "06":{color:"var(--c06)",title:"06 · Cubemaps 立方体贴图",badge:"Shader 资源",stages:["vertex","fragment","resource"],path:"Cubemap Resource → Shader Sampling",summary:"Cubemap 不是一个新的管线阶段，而是一种由六个方向组成的纹理资源。Shader 使用三维方向向量进行采样：Skybox 用方向找到背景颜色，反射和折射则根据视线、法线计算新的采样方向。"},
+    "07":{color:"var(--c07)",title:"07 · Advanced Data 高级数据",badge:"顶点输入 / Buffer",stages:["cpu","vertexInput","vertex"],path:"CPU Data → Buffer Object → VAO / Attribute → Vertex Shader",summary:"这一节主要研究数据进入 Vertex Shader 之前发生什么：Buffer 如何分配、局部更新、映射和复制，以及 VAO / glVertexAttribPointer 如何解释 Buffer 中的字节。Buffer 是实际内存，Buffer Target 描述当前用途，Vertex Attribute 决定这些数据怎样进入 Vertex Shader。"},
+    "08":{color:"var(--c08)",title:"08 · Advanced GLSL 高级 GLSL",badge:"Shader 数据接口",stages:["vertex","fragment","resource"],path:"CPU / UBO → Shader Program；Vertex Shader → Interface → Fragment Shader",summary:"Advanced GLSL 关注 Shader 自己的数据接口。Built-in Variables 是管线自动提供的数据；Interface Block 用来组织 Shader Stage 之间的输入输出；UBO 则让多个 Shader Program 从同一个 Buffer 中读取共享 uniform。它们改变的是 Shader 如何接收、传递和共享数据，而不是增加新的渲染阶段。"},
+    "09":{color:"var(--c09)",title:"09 · Geometry Shader 几何着色器",badge:"Shader Stage",stages:["assembly","geometry","raster"],path:"Primitive Assembly → Geometry Shader → Rasterization",summary:"Geometry Shader 是这一段里真正新增的 Shader Stage。Vertex Shader 一次处理一个顶点，而 Geometry Shader 一次接收一个完整 point / line / triangle，并可以通过 EmitVertex / EndPrimitive 输出新的图元，因此可以做面级爆破、法线可视化或图元扩展。"},
+    "10":{color:"var(--c10)",title:"10 · Instancing 实例化",badge:"Draw / 数据频率",stages:["cpu","vertexInput","vertex","instance"],path:"Instance VBO + Mesh VBO → Vertex Shader；glDraw*Instanced",summary:"Instancing 也不是新的管线阶段。它改变的是重复物体的提交方式：Mesh 的 position / normal / UV 仍按 vertex 前进，而 offset、color、model matrix 等数据通过 glVertexAttribDivisor 按 instance 前进。这样很多共享同一份 Mesh 的物体可以用一次实例化 Draw Call 提交，显著减少 CPU 反复发出绘制命令的开销。"}
+  };
+  const buttons=[...document.querySelectorAll(".topic")],stages=[...document.querySelectorAll("[data-stage]")];
+  const title=document.getElementById("title"),badge=document.getElementById("badge"),path=document.getElementById("path"),summary=document.getElementById("summary");
+  function select(id){
+    const d=data[id];document.documentElement.style.setProperty("--active",d.color);
+    buttons.forEach(b=>b.classList.toggle("active",b.dataset.id===id));
+    stages.forEach(s=>s.classList.toggle("hot",d.stages.includes(s.dataset.stage)));
+    title.textContent=d.title;badge.textContent=d.badge;path.textContent=d.path;summary.textContent=d.summary;
+  }
+  buttons.forEach(b=>b.addEventListener("click",()=>select(b.dataset.id)));
+  select("10");
+})();
+</script>
+</body>
+</html>
