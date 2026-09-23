@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>11 · Anti Aliasing · Pipeline</title>
+<style>
+:root{color-scheme:light dark;--panel:#fff;--card:#f7f9fc;--text:#172033;--muted:#667085;--border:#d9e1eb;--line:#aab6c7;--accent:#e6673f}
+@media(prefers-color-scheme:dark){:root{--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49;--line:#596679}}
+*{box-sizing:border-box}body{margin:0;background:transparent;color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:4px}.top,.focus{border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:16px}.focus{margin-top:14px}
+.kicker{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.pipeline{display:grid;grid-template-columns:repeat(17,max-content);align-items:center;gap:7px;overflow-x:auto;padding-bottom:6px}
+.stage{width:116px;min-height:88px;border:1px solid var(--border);background:var(--card);border-radius:12px;padding:10px 8px;display:flex;flex-direction:column;justify-content:center;text-align:center;opacity:.3;position:relative}
+.stage b{font-size:13px;line-height:1.25}.stage span{font-size:10.5px;color:var(--muted);line-height:1.4;margin-top:6px}
+.stage.hot{opacity:1;border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--card));box-shadow:inset 0 0 0 1px var(--accent)}
+.arr{color:var(--line);font-size:18px}.hot + .arr,.arr:has(+ .hot){color:var(--accent)}
+.focus h2{font-size:18px;margin:0 0 6px}.focus p{font-size:13px;color:var(--muted);line-height:1.7;margin:0 0 14px}
+.diagram{border:1px solid var(--border);background:var(--card);border-radius:14px;padding:16px}
+svg{width:100%;height:auto;max-height:285px}.n{fill:var(--panel);stroke:var(--border);stroke-width:2}.h{fill:color-mix(in srgb,var(--accent) 12%,var(--panel));stroke:var(--accent);stroke-width:3}.t{fill:var(--text);font:600 16px system-ui}.s{fill:var(--muted);font:13px system-ui}.a{stroke:var(--accent);stroke-width:3;fill:none}
+</style></head><body><div class="wrap">
+<section class="top"><div class="kicker">11 · Anti Aliasing · 在完整渲染管线中的位置</div><div class="pipeline">
+<div class="stage"><b>CPU / Draw</b><span>数据准备</span></div><div class="arr">→</div>
+<div class="stage"><b>Vertex Input</b><span>VAO / VBO</span></div><div class="arr">→</div>
+<div class="stage"><b>Vertex Shader</b><span>逐顶点</span></div><div class="arr">→</div>
+<div class="stage"><b>Primitive Assembly</b><span>组装图元</span></div><div class="arr">→</div>
+<div class="stage"><b>Geometry Shader</b><span>可选</span></div><div class="arr">→</div>
+<div class="stage hot"><b>Rasterization</b><span>Coverage / Samples</span></div><div class="arr">→</div>
+<div class="stage hot"><b>Fragment Shader</b><span>片段颜色</span></div><div class="arr">→</div>
+<div class="stage hot"><b>Per-Sample</b><span>Depth / Stencil</span></div><div class="arr">→</div>
+<div class="stage hot"><b>Framebuffer</b><span>Multisample → Resolve</span></div>
+</div></section>
+<section class="focus"><h2>一个像素从“1 个判断点”变成“多个覆盖样本”</h2><p>锯齿来自连续几何投到离散像素网格。MSAA 在边缘像素里保留多个 sample 的覆盖结果，最后 Resolve 成普通像素，因此边缘不再只有全有 / 全无两种状态。</p>
+<div class="diagram"><svg viewBox="0 0 920 280">
+<defs><marker id="m" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto"><path d="M0,0 L0,6 L9,3 z" fill="var(--accent)"/></marker></defs>
+<rect class="n" x="35" y="65" width="180" height="145" rx="16"/><text class="t" x="125" y="101" text-anchor="middle">Triangle Edge</text><path class="a" d="M70 180 L170 95"/><text class="s" x="125" y="235" text-anchor="middle">连续几何</text>
+<path class="a" d="M235 138 H330" marker-end="url(#m)"/>
+<rect class="h" x="350" y="45" width="215" height="185" rx="16"/><text class="t" x="458" y="81" text-anchor="middle">4x MSAA</text>
+<circle cx="410" cy="125" r="6" fill="var(--accent)"/><circle cx="500" cy="125" r="6" fill="var(--accent)"/><circle cx="410" cy="175" r="6" fill="var(--line)"/><circle cx="500" cy="175" r="6" fill="var(--line)"/>
+<path class="a" d="M385 190 L525 102"/><text class="s" x="458" y="213" text-anchor="middle">2 / 4 samples covered</text>
+<path class="a" d="M585 138 H680" marker-end="url(#m)"/>
+<rect class="h" x="700" y="65" width="185" height="145" rx="16"/><text class="t" x="792" y="103" text-anchor="middle">Resolve</text><text class="s" x="792" y="137" text-anchor="middle">多个 samples</text><text class="s" x="792" y="160" text-anchor="middle">→ 1 个最终像素</text><text class="s" x="792" y="235" text-anchor="middle">边缘呈现部分覆盖</text>
+</svg></div></section></div></body></html>
