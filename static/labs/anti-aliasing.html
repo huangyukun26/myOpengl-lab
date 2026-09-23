@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Anti Aliasing Lab</title>
+<style>
+:root{color-scheme:light dark;--bg:#f6f8fb;--panel:#fff;--card:#f8fafc;--text:#172033;--muted:#697386;--border:#d8e0ea;--accent:#e6673f}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1117;--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:18px}.head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:14px}.head h1{font-size:22px;margin:0}.head p{color:var(--muted);font-size:13px;margin:5px 0 0}
+.controls{display:flex;gap:8px;flex-wrap:wrap}.controls button{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:9px;padding:8px 11px;cursor:pointer}.controls button.active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+.stage{border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:14px}.labels{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px}.labels div{text-align:center;font-size:12px;color:var(--muted)}canvas{width:100%;aspect-ratio:16/7;display:block;border-radius:12px;background:#111}
+.explain{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.card{border:1px solid var(--border);background:var(--panel);border-radius:14px;padding:14px}.card h2{font-size:15px;margin:0 0 8px}.card p,.card pre{font-size:12px;line-height:1.65;color:var(--muted);margin:0}.card pre{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--card);padding:10px;border-radius:10px;border:1px solid var(--border)}
+.samples{display:grid;grid-template-columns:repeat(4,34px);gap:10px;align-items:center;justify-content:start;margin:10px 0}.sample{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;display:grid;place-items:center;font-size:11px}.sample.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 15%,var(--panel))}
+@media(max-width:760px){.head{align-items:flex-start;flex-direction:column}.explain{grid-template-columns:1fr}.wrap{padding:12px}}
+</style></head>
+<body><div class="wrap">
+<div class="head"><div><h1>Anti Aliasing · MSAA Lab</h1><p>WebGL2 实际离屏渲染：左侧 1x，右侧 multisample framebuffer Resolve 后的结果。</p></div>
+<div class="controls"><button id="rotate" class="active">改变边缘角度</button><button id="pause">暂停</button><button id="zoom">放大边缘</button></div></div>
+<section class="stage"><div class="labels"><div>1x · Single Sample</div><div id="msLabel">4x · MSAA → Resolve</div></div><canvas id="gl" width="1200" height="525"></canvas></section>
+<div class="explain">
+<section class="card"><h2>边缘像素发生了什么</h2><p>单采样只做一次覆盖判断；MSAA 在同一个像素里保存多个 sample。边缘只覆盖其中一部分时，Resolve 后得到中间颜色。</p><div class="samples"><div class="sample on">●</div><div class="sample on">●</div><div class="sample">○</div><div class="sample">○</div></div><p>示意：2 / 4 samples 被覆盖 → 这个像素表现为“部分被三角形覆盖”。</p></section>
+<section class="card"><h2>离屏 MSAA 数据流</h2><pre>Scene
+  ↓
+Multisampled Renderbuffer
+  ↓  gl.blitFramebuffer(...)
+Resolved Texture
+  ↓
+Screen Quad</pre></section>
+</div>
+</div><script src="anti-aliasing.js"></script></body></html>
