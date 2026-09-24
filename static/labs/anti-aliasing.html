@@ -12,7 +12,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui
 .head h1{font-size:22px;margin:0}.head p{color:var(--muted);font-size:13px;margin:5px 0 0;line-height:1.6}
 .controls{display:flex;gap:8px;flex-wrap:wrap}
 .controls button{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:9px;padding:8px 11px;cursor:pointer}
-.controls button.active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+.controls button.active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}.zoomCtl{display:flex;align-items:center;gap:7px;border:1px solid var(--border);background:var(--panel);border-radius:9px;padding:6px 9px;font-size:12px;color:var(--muted)}.zoomCtl input{width:150px}.zoomCtl span{min-width:46px;text-align:right;color:var(--text)}
 .stage{border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:14px}
 .gridLabels{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
 .gridLabels div{text-align:center;font-size:12px;color:var(--muted)}
@@ -37,13 +37,17 @@ canvas{width:100%;aspect-ratio:3/2;display:block;border-radius:12px;background:#
     <button class="scene" data-scene="texture">纹理高频</button>
     <button id="rotate">改变角度</button>
     <button id="pause">暂停</button>
+    <label class="zoomCtl">缩放
+      <input id="zoomRange" type="range" min="0.55" max="2.8" step="0.05" value="0.92">
+      <span id="zoomValue">0.92×</span>
+    </label>
   </div>
 </div>
 
 <section class="stage">
   <div class="gridLabels"><div>上：1x vs 2x MSAA</div><div>下：4x MSAA vs 4x SSAA</div></div>
   <canvas id="gl" width="1200" height="800"></canvas>
-  <div class="caption">提示：切换到“纹理高频”后，观察 2x / 4x MSAA 是否仍然明显优于 1x；再看 SSAA 的变化。</div>
+  <div class="caption">提示：可以拖动“缩放”自由放大/缩小场景。几何边缘模式下，放大到 1.5×～2.5× 最容易观察 1x / 2x / 4x MSAA 的轮廓差异。</div>
 </section>
 
 <section class="compare">
