@@ -115,7 +115,7 @@ function drawScene(target,w,h,angle,mode){
   gl.disable(gl.BLEND);gl.clearColor(.025,.03,.045,1);gl.clear(gl.COLOR_BUFFER_BIT);
   gl.useProgram(sceneP);
   gl.uniform1f(gl.getUniformLocation(sceneP,'uAngle'),mode===0?angle:0);
-  gl.uniform1f(gl.getUniformLocation(sceneP,'uScale'),mode===0?0.92:1.0);
+  gl.uniform1f(gl.getUniformLocation(sceneP,'uScale'),mode===0?zoom:1.0);
   gl.uniform1i(gl.getUniformLocation(sceneP,'uMode'),mode);
   gl.uniform2f(gl.getUniformLocation(sceneP,'uResolution'),w,h);
   gl.bindVertexArray(mode===0?tri:full);
@@ -145,12 +145,18 @@ function drawSeparator(){
   gl.disable(gl.SCISSOR_TEST);
 }
 
-let running=true,angle=.18,last=0,mode=0;
+let running=true,angle=.18,last=0,mode=0,zoom=0.92;
 document.querySelectorAll('.scene').forEach(btn=>btn.onclick=()=>{
   document.querySelectorAll('.scene').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');mode=btn.dataset.scene==='geometry'?0:1;
 });
 document.getElementById('rotate').onclick=()=>{angle+=.16;};
+const zoomRange=document.getElementById('zoomRange');
+const zoomValue=document.getElementById('zoomValue');
+zoomRange.oninput=()=>{
+  zoom=parseFloat(zoomRange.value);
+  zoomValue.textContent=zoom.toFixed(2)+'×';
+};
 document.getElementById('pause').onclick=e=>{
   running=!running;e.currentTarget.textContent=running?'暂停':'继续';e.currentTarget.classList.toggle('active',!running);
 };
