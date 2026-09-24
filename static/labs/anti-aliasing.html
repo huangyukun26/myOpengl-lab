@@ -5,26 +5,58 @@
 <style>
 :root{color-scheme:light dark;--bg:#f6f8fb;--panel:#fff;--card:#f8fafc;--text:#172033;--muted:#697386;--border:#d8e0ea;--accent:#e6673f}
 @media(prefers-color-scheme:dark){:root{--bg:#0d1117;--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-.wrap{max-width:1180px;margin:auto;padding:18px}.head{display:flex;justify-content:space-between;gap:16px;align-items:end;margin-bottom:14px}.head h1{font-size:22px;margin:0}.head p{color:var(--muted);font-size:13px;margin:5px 0 0}
-.controls{display:flex;gap:8px;flex-wrap:wrap}.controls button{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:9px;padding:8px 11px;cursor:pointer}.controls button.active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
-.stage{border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:14px}.labels{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:8px}.labels div{text-align:center;font-size:12px;color:var(--muted)}canvas{width:100%;aspect-ratio:16/7;display:block;border-radius:12px;background:#111}
-.explain{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.card{border:1px solid var(--border);background:var(--panel);border-radius:14px;padding:14px}.card h2{font-size:15px;margin:0 0 8px}.card p,.card pre{font-size:12px;line-height:1.65;color:var(--muted);margin:0}.card pre{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--card);padding:10px;border-radius:10px;border:1px solid var(--border)}
-.samples{display:grid;grid-template-columns:repeat(4,34px);gap:10px;align-items:center;justify-content:start;margin:10px 0}.sample{width:34px;height:34px;border:1px solid var(--border);border-radius:8px;display:grid;place-items:center;font-size:11px}.sample.on{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 15%,var(--panel))}
-@media(max-width:760px){.head{align-items:flex-start;flex-direction:column}.explain{grid-template-columns:1fr}.wrap{padding:12px}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1220px;margin:auto;padding:18px}
+.head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end;margin-bottom:14px}
+.head h1{font-size:22px;margin:0}.head p{color:var(--muted);font-size:13px;margin:5px 0 0;line-height:1.6}
+.controls{display:flex;gap:8px;flex-wrap:wrap}
+.controls button{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:9px;padding:8px 11px;cursor:pointer}
+.controls button.active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+.stage{border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:14px}
+.gridLabels{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}
+.gridLabels div{text-align:center;font-size:12px;color:var(--muted)}
+canvas{width:100%;aspect-ratio:3/2;display:block;border-radius:12px;background:#111;image-rendering:pixelated}
+.caption{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.6}
+.compare{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+.method{border:1px solid var(--border);background:var(--panel);border-radius:13px;padding:12px}
+.method h3{font-size:13px;margin:0 0 6px}.method p{font-size:11.5px;line-height:1.6;color:var(--muted);margin:0}
+.method strong{color:var(--text)}
+.note{margin-top:14px;border:1px solid var(--border);background:var(--panel);border-radius:14px;padding:14px}
+.note h2{font-size:15px;margin:0 0 7px}.note p{font-size:12px;line-height:1.7;color:var(--muted);margin:0}
+@media(max-width:760px){.head{align-items:flex-start;flex-direction:column}.compare{grid-template-columns:1fr 1fr}.wrap{padding:12px}}
 </style></head>
 <body><div class="wrap">
-<div class="head"><div><h1>Anti Aliasing · MSAA Lab</h1><p>WebGL2 实际离屏渲染：左侧 1x，右侧 multisample framebuffer Resolve 后的结果。</p></div>
-<div class="controls"><button id="rotate" class="active">改变边缘角度</button><button id="pause">暂停</button><button id="zoom">放大边缘</button></div></div>
-<section class="stage"><div class="labels"><div>1x · Single Sample</div><div id="msLabel">4x · MSAA → Resolve</div></div><canvas id="gl" width="1200" height="525"></canvas></section>
-<div class="explain">
-<section class="card"><h2>边缘像素发生了什么</h2><p>单采样只做一次覆盖判断；MSAA 在同一个像素里保存多个 sample。边缘只覆盖其中一部分时，Resolve 后得到中间颜色。</p><div class="samples"><div class="sample on">●</div><div class="sample on">●</div><div class="sample">○</div><div class="sample">○</div></div><p>示意：2 / 4 samples 被覆盖 → 这个像素表现为“部分被三角形覆盖”。</p></section>
-<section class="card"><h2>离屏 MSAA 数据流</h2><pre>Scene
-  ↓
-Multisampled Renderbuffer
-  ↓  gl.blitFramebuffer(...)
-Resolved Texture
-  ↓
-Screen Quad</pre></section>
+<div class="head">
+  <div>
+    <h1>Anti Aliasing · Sampling Comparison Lab</h1>
+    <p>同一个场景同时用 1x、2x MSAA、4x MSAA、4x SSAA 渲染。内部故意使用低分辨率，再把结果放大，锯齿差异会更明显。</p>
+  </div>
+  <div class="controls">
+    <button class="scene active" data-scene="geometry">几何边缘</button>
+    <button class="scene" data-scene="texture">纹理高频</button>
+    <button id="rotate">改变角度</button>
+    <button id="pause">暂停</button>
+  </div>
 </div>
-</div><script src="anti-aliasing.js"></script></body></html>
+
+<section class="stage">
+  <div class="gridLabels"><div>上：1x vs 2x MSAA</div><div>下：4x MSAA vs 4x SSAA</div></div>
+  <canvas id="gl" width="1200" height="800"></canvas>
+  <div class="caption">提示：切换到“纹理高频”后，观察 2x / 4x MSAA 是否仍然明显优于 1x；再看 SSAA 的变化。</div>
+</section>
+
+<section class="compare">
+  <div class="method"><h3>1x · Single Sample</h3><p><strong>Coverage：</strong>1 个 sample。边缘只能做“覆盖 / 不覆盖”的二选一。</p></div>
+  <div class="method"><h3>2x · MSAA</h3><p><strong>Coverage：</strong>2 个 samples。几何边缘开始出现部分覆盖信息。</p></div>
+  <div class="method"><h3>4x · MSAA</h3><p><strong>Coverage：</strong>4 个 samples。几何轮廓通常更稳定，但 Fragment Shader 内部信号并没有按 4 倍完整采样。</p></div>
+  <div class="method"><h3>4x · SSAA</h3><p><strong>Shading：</strong>2×2 更高分辨率完整渲染，再缩回原尺寸，因此几何和纹理内部都能得到更多采样。</p></div>
+</section>
+
+<section class="note">
+  <h2>这个 Lab 要观察的不是“谁更糊”，而是它们到底多采样了什么</h2>
+  <p>“几何边缘”模式下，MSAA 会非常明显，因为不同 sample 会得到不同的 primitive coverage；“纹理高频”模式里整块屏幕都被几何覆盖，coverage 几乎没有差别，所以 MSAA 帮助很有限，而 SSAA 因为真的以更高分辨率执行 shading，会更容易改善内部纹理走样。</p>
+</section>
+</div>
+<script src="anti-aliasing.js"></script>
+</body></html>
