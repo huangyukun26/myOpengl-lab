@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Advanced Lighting · Pipeline</title>
+<style>
+:root{color-scheme:light dark;--panel:#fff;--card:#f7f9fc;--text:#172033;--muted:#667085;--border:#d9e1eb;--line:#aab6c7;--accent:#f08a3c}
+@media(prefers-color-scheme:dark){:root{--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49;--line:#596679}}
+*{box-sizing:border-box}body{margin:0;background:transparent;color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:4px}.top,.focus{border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:16px}.focus{margin-top:14px}
+.kicker{font-size:11px;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+.pipeline{display:grid;grid-template-columns:repeat(17,max-content);align-items:center;gap:7px;overflow-x:auto;padding-bottom:6px}
+.stage{width:116px;min-height:88px;border:1px solid var(--border);background:var(--card);border-radius:12px;padding:10px 8px;display:flex;flex-direction:column;justify-content:center;text-align:center;opacity:.28}
+.stage b{font-size:13px}.stage span{font-size:10.5px;color:var(--muted);line-height:1.4;margin-top:6px}.stage.hot{opacity:1;border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--card));box-shadow:inset 0 0 0 1px var(--accent)}
+.arr{color:var(--line);font-size:18px}.hot + .arr,.arr:has(+ .hot){color:var(--accent)}
+.focus h2{font-size:18px;margin:0 0 6px}.focus p{font-size:13px;color:var(--muted);line-height:1.7;margin:0 0 14px}
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px}.box{border:1px solid var(--border);background:var(--card);border-radius:14px;padding:14px}.box h3{font-size:14px;margin:0 0 8px}.eq{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;color:var(--muted);line-height:1.7}.diagram{margin-top:10px;text-align:center;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;white-space:pre;color:var(--text);line-height:1.45}
+@media(max-width:720px){.compare{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<section class="top"><div class="kicker">Advanced Lighting · 在完整渲染管线中的位置</div><div class="pipeline">
+<div class="stage"><b>CPU / Draw</b><span>光源 / 相机 uniform</span></div><div class="arr">→</div>
+<div class="stage"><b>Vertex Input</b><span>Position / Normal</span></div><div class="arr">→</div>
+<div class="stage"><b>Vertex Shader</b><span>世界位置 / 法线</span></div><div class="arr">→</div>
+<div class="stage"><b>Primitive Assembly</b><span>组装图元</span></div><div class="arr">→</div>
+<div class="stage"><b>Geometry Shader</b><span>可选</span></div><div class="arr">→</div>
+<div class="stage"><b>Rasterization</b><span>插值 Fragment 输入</span></div><div class="arr">→</div>
+<div class="stage hot"><b>Fragment Shader</b><span>Phong / Blinn-Phong</span></div><div class="arr">→</div>
+<div class="stage"><b>Per-Sample</b><span>Depth / Blend</span></div><div class="arr">→</div>
+<div class="stage"><b>Framebuffer</b><span>最终颜色</span></div>
+</div></section>
+<section class="focus"><h2>这一节只改镜面高光的几何关系</h2><p>Ambient 和 Diffuse 不变。区别集中在 Fragment Shader：Phong 比较 V 与反射方向 R；Blinn-Phong 构造 H = normalize(L + V)，比较 N 与 H。</p>
+<div class="compare">
+<div class="box"><h3>Phong</h3><div class="eq">R = reflect(-L, N)<br>spec = pow(max(dot(V, R), 0), s)</div><div class="diagram">      N
+      ↑
+ L ↘  │  ↗ R
+      •────→ V
+
+看 V 是否接近 R</div></div>
+<div class="box"><h3>Blinn-Phong</h3><div class="eq">H = normalize(L + V)<br>spec = pow(max(dot(N, H), 0), s)</div><div class="diagram">      N
+      ↑ H
+      ↑
+ L ↘  •  ↗ V
+
+看 H 是否接近 N</div></div>
+</div></section></div></body></html>
