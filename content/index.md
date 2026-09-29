@@ -25,7 +25,11 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 [[learn/04-advanced-opengl/10-instancing|10 · Instancing 实例化]]  
 [[learn/04-advanced-opengl/11-anti-aliasing|11 · Anti Aliasing 抗锯齿]]
 
-当前章节：**Anti Aliasing**。重点是理解锯齿来自光栅化时的离散采样，以及 MSAA 如何通过多个子采样点记录边缘覆盖率，并在 Resolve 后得到更平滑的像素结果。
+### Advanced Lighting
+
+[[learn/05-advanced-lighting/01-advanced-lighting|01 · Advanced Lighting 高级光照]]
+
+当前章节：**Advanced Lighting**。这一节从 Phong 镜面高光的反射向量问题出发，引入 Blinn-Phong 的 Halfway Vector，重点理解两种模型如何用不同的几何关系计算 Specular。
 
 ## Interactive Labs
 
@@ -38,6 +42,7 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 <form action="/myOpengl-lab/static/labs/geometry-shader.html" method="get"><button type="submit">🎮 Geometry Shader Lab · Primitive In / Primitive Out</button></form>
 <form action="/myOpengl-lab/static/labs/instancing.html" method="get"><button type="submit">🎮 Instancing Lab · Draw Calls / Divisor / Asteroid Belt</button></form>
 <form action="/myOpengl-lab/static/labs/anti-aliasing.html" method="get"><button type="submit">🎮 Anti Aliasing Lab · 1x / MSAA / Resolve</button></form>
+<form action="/myOpengl-lab/static/labs/advanced-lighting.html" method="get"><button type="submit">🎮 Advanced Lighting Lab · Phong / Blinn-Phong</button></form>
 
 ## Notes
 
