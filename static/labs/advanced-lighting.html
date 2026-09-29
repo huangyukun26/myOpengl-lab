@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Advanced Lighting Lab</title>
+<style>
+:root{color-scheme:light dark;--bg:#f5f7fa;--panel:#fff;--card:#f8fafc;--text:#172033;--muted:#667085;--border:#d9e1eb;--accent:#f08a3c}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1117;--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:18px}.head{display:flex;justify-content:space-between;gap:18px;align-items:flex-end}.head h1{font-size:22px;margin:0}.head p{font-size:13px;color:var(--muted);margin:5px 0 0;line-height:1.6}
+.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.ctl{border:1px solid var(--border);background:var(--panel);border-radius:10px;padding:7px 9px;font-size:11px;color:var(--muted);display:flex;align-items:center;gap:7px}.ctl input[type=range]{width:120px}.ctl span{min-width:40px;color:var(--text);text-align:right}.controls button{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:10px;padding:8px 10px;cursor:pointer}.controls button.active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+.stage{margin-top:14px;border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:14px}.labels{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px}.labels div{text-align:center;font-size:12px;color:var(--muted)}canvas{display:block;width:100%;aspect-ratio:16/7;border-radius:12px;background:#10131a}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.card{border:1px solid var(--border);background:var(--panel);border-radius:14px;padding:14px}.card h2{font-size:15px;margin:0 0 8px}.card p,.code{font-size:12px;color:var(--muted);line-height:1.7;margin:0}.code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--card);border:1px solid var(--border);padding:10px;border-radius:10px;white-space:pre-wrap;margin-top:9px}
+@media(max-width:800px){.head{align-items:flex-start;flex-direction:column}.info{grid-template-columns:1fr}.ctl input[type=range]{width:95px}}
+</style></head>
+<body><div class="wrap">
+<div class="head">
+<div><h1>Advanced Lighting · Phong vs Blinn-Phong</h1><p>同一块地面、同一光源、同一相机。只替换镜面高光公式。</p></div>
+<div class="controls">
+<label class="ctl">Phong 指数 <input id="shininess" type="range" min="1" max="64" step="1" value="8"><span id="shineVal">8</span></label>
+<label class="ctl">相机角度 <input id="camera" type="range" min="-55" max="55" step="1" value="22"><span id="camVal">22°</span></label>
+<label class="ctl">光源 X <input id="light" type="range" min="-4" max="4" step="0.1" value="0"><span id="lightVal">0.0</span></label>
+<button id="matched" class="active">Blinn ×4 指数</button>
+<button id="low">低指数演示</button>
+</div></div>
+<section class="stage">
+<div class="labels"><div id="leftLabel">Phong · shininess 8</div><div id="rightLabel">Blinn-Phong · shininess 32</div></div>
+<canvas id="gl" width="1200" height="525"></canvas>
+</section>
+<div class="info">
+<section class="card"><h2>Phong：比较 V 和 R</h2><p>当 V 与 R 的夹角超过 90° 时，dot(V,R) 变成负数，max(...,0) 会把镜面项直接截成 0。低 shininess 时高光本来应该很宽，因此这个截断更容易被看见。</p><div class="code">R = reflect(-L, N)
+spec = pow(max(dot(V, R), 0.0), shininess)</div></section>
+<section class="card"><h2>Blinn-Phong：比较 N 和 H</h2><p>H 是 L 与 V 的中间方向。可见表面上 H 与 N 的夹角变化更平滑，因此高光边缘通常不会出现 Phong 那种突兀截断。</p><div class="code">H = normalize(L + V)
+spec = pow(max(dot(N, H), 0.0), shininess)</div></section>
+</div>
+</div><script src="advanced-lighting.js"></script></body></html>
