@@ -1,135 +1,207 @@
 (()=>{
-const canvas=document.getElementById('view');
-const ctx=canvas.getContext('2d');
-const gammaEl=document.getElementById('gamma');
-const gammaVal=document.getElementById('gammaVal');
-const expEl=document.getElementById('exposure');
-const expVal=document.getElementById('exposureVal');
-const modeText=document.getElementById('modeText');
-const leftText=document.getElementById('leftText');
-const formula=document.getElementById('formula');
-const leftTitle=document.getElementById('leftTitle');
+const canvas=document.getElementById('gl');
+const gl=canvas.getContext('webgl2',{antialias:true});
+if(!gl){document.body.innerHTML='<p style="padding:24px">需要支持 WebGL2 的浏览器。</p>';return;}
 
-let mode='gray', gamma=2.2, exposure=1.0;
+function shader(type,src){
+  const s=gl.createShader(type);gl.shaderSource(s,src);gl.compileShader(s);
+  if(!gl.getShaderParameter(s,gl.COMPILE_STATUS))throw new Error(gl.getShaderInfoLog(s));
+  return s;
+}
+function program(vs,fs){
+  const p=gl.createProgram();gl.attachShader(p,shader(gl.VERTEX_SHADER,vs));gl.attachShader(p,shader(gl.FRAGMENT_SHADER,fs));gl.linkProgram(p);
+  if(!gl.getProgramParameter(p,gl.LINK_STATUS))throw new Error(gl.getProgramInfoLog(p));
+  return p;
+}
 
+const planeVS=['#version 300 es',
+'layout(location=0) in vec3 aPos;',
+'uniform mat4 uVP;',
+'out vec3 FragPos;',
+'out vec2 UV;',
+'void main(){FragPos=aPos;UV=aPos.xz*0.55;gl_Position=uVP*vec4(aPos,1.0);}'].join('\n');
+
+const planeFS=['#version 300 es','precision highp float;',
+'in vec3 FragPos;in vec2 UV;out vec4 FragColor;',
+'uniform vec3 uViewPos;',
+'uniform vec3 uLightPos[4];',
+'uniform vec3 uLightColor[4];',
+'uniform float uIntensity;',
+'uniform int uVariant;',
+'vec3 woodSRGB(vec2 uv){',
+'  float ring=sin((uv.x*6.0 + sin(uv.y*2.4)*0.8)*3.14159);',
+'  float grain=sin((uv.x*38.0 + sin(uv.y*13.0)*1.7));',
+'  float knots=sin(length(vec2(uv.x*0.55,uv.y))*18.0);',
+'  float f=0.55 + 0.18*ring + 0.08*grain + 0.04*knots;',
+'  f=clamp(f,0.15,0.95);',
+'  vec3 dark=vec3(0.18,0.065,0.018);',
+'  vec3 light=vec3(0.68,0.33,0.095);',
+'  return mix(dark,light,f);',
+'}',
+'void main(){',
+'  bool decodeTexture = (uVariant==1 || uVariant==3 || uVariant==4);',
+'  bool quadratic = (uVariant==1 || uVariant==2 || uVariant==4);',
+'  bool encodeOutput = (uVariant==1 || uVariant==2 || uVariant==3);',
+'  vec3 stored=woodSRGB(UV);',
+'  vec3 albedo=decodeTexture ? pow(stored,vec3(2.2)) : stored;',
+'  vec3 N=vec3(0.0,1.0,0.0);',
+'  vec3 V=normalize(uViewPos-FragPos);',
+'  vec3 lighting=vec3(0.018);',
+'  for(int i=0;i<4;i++){',
+'    vec3 Lvec=uLightPos[i]-FragPos;',
+'    float d=max(length(Lvec),0.2);',
+'    vec3 L=Lvec/d;',
+'    float diff=max(dot(N,L),0.0);',
+'    vec3 H=normalize(L+V);',
+'    float spec=pow(max(dot(N,H),0.0),64.0);',
+'    float att=quadratic ? 1.0/(d*d) : 1.0/d;',
+'    lighting += (diff*albedo + spec*vec3(0.28))*uLightColor[i]*att*uIntensity;',
+'  }',
+'  vec3 color=lighting;',
+'  color=color/(color+vec3(1.0));',
+'  if(encodeOutput) color=pow(color,vec3(1.0/2.2));',
+'  FragColor=vec4(color,1.0);',
+'}'].join('\n');
+
+const pointVS=['#version 300 es',
+'layout(location=0) in vec3 aPos;',
+'uniform mat4 uVP;',
+'uniform float uSize;',
+'void main(){gl_Position=uVP*vec4(aPos,1.0);gl_PointSize=uSize;}'].join('\n');
+
+const pointFS=['#version 300 es','precision highp float;',
+'uniform vec3 uColor;out vec4 FragColor;',
+'void main(){vec2 p=gl_PointCoord*2.0-1.0;float r=dot(p,p);if(r>1.0)discard;float glow=smoothstep(1.0,0.0,r);FragColor=vec4(uColor*(1.2+1.8*glow),1.0);}'].join('\n');
+
+const planeP=program(planeVS,planeFS), pointP=program(pointVS,pointFS);
+
+const planeVerts=new Float32Array([
+ -6,0, 4,  -6,0,-4,   6,0,-4,
+ -6,0, 4,   6,0,-4,   6,0, 4
+]);
+const planeVAO=gl.createVertexArray();gl.bindVertexArray(planeVAO);
+const pb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pb);gl.bufferData(gl.ARRAY_BUFFER,planeVerts,gl.STATIC_DRAW);
+gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,0,0);
+
+const pointVAO=gl.createVertexArray();gl.bindVertexArray(pointVAO);
+const pointBuf=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,pointBuf);
+gl.bufferData(gl.ARRAY_BUFFER,new Float32Array(12),gl.DYNAMIC_DRAW);
+gl.enableVertexAttribArray(0);gl.vertexAttribPointer(0,3,gl.FLOAT,false,0,0);
+
+function norm(v){const l=Math.hypot(v[0],v[1],v[2]);return [v[0]/l,v[1]/l,v[2]/l];}
+function sub(a,b){return[a[0]-b[0],a[1]-b[1],a[2]-b[2]];}
+function cross(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}
+function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+function perspective(fov,aspect,n,f){const t=1/Math.tan(fov/2),nf=1/(n-f);return new Float32Array([t/aspect,0,0,0,0,t,0,0,0,0,(f+n)*nf,-1,0,0,2*f*n*nf,0]);}
+function lookAt(e,c,u){const z=norm(sub(e,c)),x=norm(cross(u,z)),y=cross(z,x);return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,e),-dot(y,e),-dot(z,e),1]);}
+function mul(a,b){const o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r<4;r++){let s=0;for(let k=0;k<4;k++)s+=a[k*4+r]*b[c*4+k];o[c*4+r]=s;}return o;}
+
+let mode='demo', intensity=1.15, cameraY=2.7, animate=true;
+let lightBase=[-3,-1,1,3];
+const lightScale=[0.28,0.55,0.85,1.18];
+
+const intensityEl=document.getElementById('intensity');
+const cameraEl=document.getElementById('camera');
+intensityEl.oninput=()=>{intensity=+intensityEl.value;document.getElementById('intensityVal').textContent=intensity.toFixed(2);};
+cameraEl.oninput=()=>{cameraY=+cameraEl.value;document.getElementById('cameraVal').textContent=cameraY.toFixed(1);};
+document.getElementById('animate').onclick=e=>{animate=!animate;e.currentTarget.classList.toggle('active',animate);e.currentTarget.textContent=animate?'灯光缓慢移动':'灯光已暂停';};
+document.getElementById('reset').onclick=()=>{
+ intensity=1.15;cameraY=2.7;animate=true;
+ intensityEl.value='1.15';cameraEl.value='2.7';
+ document.getElementById('intensityVal').textContent='1.15';document.getElementById('cameraVal').textContent='2.7';
+ document.getElementById('animate').classList.add('active');document.getElementById('animate').textContent='灯光缓慢移动';
+};
+
+const variants={
+ demo:[0,1],
+ output:[0,2],
+ texture:[0,3],
+ atten:[0,4]
+};
+
+function setCopy(){
+ const left=document.getElementById('leftLabel'),right=document.getElementById('rightLabel');
+ const title=document.getElementById('modeTitle'),txt=document.getElementById('modeText'),formula=document.getElementById('formula');
+ if(mode==='demo'){
+   left.textContent='Gamma OFF · GL_RGB · 1 / distance';
+   right.textContent='Gamma ON · sRGB decode · 1 / distance² · output encode';
+   title.textContent='完整 Demo';
+   txt.textContent='左侧沿用旧工作流；右侧使用完整 Linear Workflow。暗部层次、光照半径和强光附近的过渡都会变化。';
+   formula.textContent='OFF: storedColor × lighting(1/d)\nON : decode(sRGB) × lighting(1/d²) → encode(sRGB)';
+ }else if(mode==='output'){
+   left.textContent='不做最终 Gamma';
+   right.textContent='只增加最终 Linear → sRGB';
+   title.textContent='只看输出 Gamma';
+   txt.textContent='两边使用相同纹理和平方衰减，只改变最后的输出编码。右边中间亮度会明显抬起。';
+   formula.textContent='left : linearColor\nright: pow(linearColor, 1/2.2)';
+ }else if(mode==='texture'){
+   left.textContent='sRGB 纹理当 Linear 使用';
+   right.textContent='先 decode sRGB 纹理';
+   title.textContent='只看纹理解码';
+   txt.textContent='两边都使用线性衰减并做最终输出编码，唯一差别是右边先把“木纹颜色”从 sRGB 解码到 Linear。';
+   formula.textContent='left : storedColor\nright: pow(storedColor, 2.2)';
+ }else{
+   left.textContent='1 / distance';
+   right.textContent='1 / distance²';
+   title.textContent='只看衰减';
+   txt.textContent='两边都解码纹理并做最终输出编码，唯一差别是光强随距离的衰减公式。';
+   formula.textContent='left : attenuation = 1/d\nright: attenuation = 1/d²';
+ }
+}
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-  b.classList.add('active');
-  mode=b.dataset.mode;
-  draw();
+ document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+ b.classList.add('active');mode=b.dataset.mode;setCopy();
 });
-gammaEl.oninput=()=>{gamma=+gammaEl.value;gammaVal.textContent=gamma.toFixed(2);draw();};
-expEl.oninput=()=>{exposure=+expEl.value;expVal.textContent=exposure.toFixed(2);draw();};
+setCopy();
 
-function encode(x){return Math.pow(Math.max(0,x),1/gamma);}
-function display(x){return Math.pow(Math.max(0,x),gamma);}
-function byte(v){return Math.max(0,Math.min(255,Math.round(v*255)));}
-function clear(){ctx.fillStyle='#10131a';ctx.fillRect(0,0,canvas.width,canvas.height);}
-function label(t,x,y,a='left'){ctx.fillStyle='#e8edf5';ctx.font='20px system-ui';ctx.textAlign=a;ctx.fillText(t,x,y);}
-function small(t,x,y,a='left'){ctx.fillStyle='#aab4c3';ctx.font='15px system-ui';ctx.textAlign=a;ctx.fillText(t,x,y);}
+function renderSide(x,w,variant,t){
+ const aspect=w/canvas.height;
+ const eye=[0,cameraY,5.7];
+ const vp=mul(perspective(49*Math.PI/180,aspect,.1,50),lookAt(eye,[0,0,-.4],[0,1,0]));
 
-function drawGray(){
-  clear();
-  const mid=canvas.width/2, top=70, h=380;
-  label('Linear 直接送显示端',mid/2,40,'center');
-  label('Linear → sRGB encode → 显示',mid+mid/2,40,'center');
+ const wobble=animate?Math.sin(t*.00045)*.32:0;
+ const positions=[];
+ for(let i=0;i<4;i++)positions.push(lightBase[i]+(i%2? -wobble:wobble),.38,0);
 
-  for(let x=0;x<mid;x++){
-    const linear=x/(mid-1);
-    const left=display(linear)*exposure;
-    const right=display(encode(linear))*exposure;
+ gl.enable(gl.SCISSOR_TEST);gl.scissor(x,0,w,canvas.height);
+ gl.clearColor(.018,.022,.03,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+ gl.disable(gl.SCISSOR_TEST);
 
-    ctx.fillStyle='rgb('+byte(left)+','+byte(left)+','+byte(left)+')';
-    ctx.fillRect(x,top,1,h);
+ gl.viewport(x,0,w,canvas.height);
+ gl.useProgram(planeP);
+ gl.uniformMatrix4fv(gl.getUniformLocation(planeP,'uVP'),false,vp);
+ gl.uniform3fv(gl.getUniformLocation(planeP,'uViewPos'),eye);
+ gl.uniform3fv(gl.getUniformLocation(planeP,'uLightPos[0]'),new Float32Array(positions));
+ const cols=[];
+ for(const s of lightScale)cols.push(s,s*.93,s*.78);
+ gl.uniform3fv(gl.getUniformLocation(planeP,'uLightColor[0]'),new Float32Array(cols));
+ gl.uniform1f(gl.getUniformLocation(planeP,'uIntensity'),intensity);
+ gl.uniform1i(gl.getUniformLocation(planeP,'uVariant'),variant);
+ gl.bindVertexArray(planeVAO);gl.drawArrays(gl.TRIANGLES,0,6);
 
-    ctx.fillStyle='rgb('+byte(right)+','+byte(right)+','+byte(right)+')';
-    ctx.fillRect(mid+x,top,1,h);
-  }
-
-  ctx.strokeStyle='#d7a62a';ctx.lineWidth=3;
-  ctx.beginPath();ctx.moveTo(mid*.5,top);ctx.lineTo(mid*.5,top+h);ctx.stroke();
-  ctx.beginPath();ctx.moveTo(mid+mid*.5,top);ctx.lineTo(mid+mid*.5,top+h);ctx.stroke();
-
-  small('linear = 0.5',mid*.5,480,'center');
-  small('linear = 0.5',mid+mid*.5,480,'center');
-
-  leftTitle.textContent='Linear value → display';
-  leftText.textContent='0 和 1 两端基本不受影响，差异集中在中间亮度。linear 0.5 直接显示会被压暗；先编码后再显示，能恢复到期望亮度。';
-  formula.textContent='display = input^gamma\nencoded = linear^(1/gamma)';
-  modeText.textContent='当前 gamma = '+gamma.toFixed(2)+'。左边没有输出校正，右边在最终显示前做逆 Gamma 编码。';
+ gl.useProgram(pointP);
+ gl.uniformMatrix4fv(gl.getUniformLocation(pointP,'uVP'),false,vp);
+ gl.uniform1f(gl.getUniformLocation(pointP,'uSize'),18.0);
+ gl.bindVertexArray(pointVAO);
+ for(let i=0;i<4;i++){
+   const p=new Float32Array(positions.slice(i*3,i*3+3));
+   gl.bindBuffer(gl.ARRAY_BUFFER,pointBuf);gl.bufferSubData(gl.ARRAY_BUFFER,0,p);
+   gl.uniform3f(gl.getUniformLocation(pointP,'uColor'),1.0,.86,.58);
+   gl.drawArrays(gl.POINTS,0,1);
+ }
 }
 
-function drawLight(){
-  clear();
-  const mid=canvas.width/2, top=80, bottom=450;
-  label('旧工作流：1 / distance',mid/2,40,'center');
-  label('Linear 工作流：1 / distance²',mid+mid/2,40,'center');
+gl.enable(gl.DEPTH_TEST);
+function frame(t){
+ const half=canvas.width/2;
+ const pair=variants[mode];
+ renderSide(0,half,pair[0],t);
+ renderSide(half,half,pair[1],t);
 
-  for(let side=0;side<2;side++){
-    const ox=side*mid;
-    for(let x=0;x<mid;x++){
-      const nx=x/(mid-1);
-      const d=.35+nx*5.2;
-      let linear=side===0 ? 1/d : 1/(d*d);
-      linear=Math.min(1,linear*exposure);
-
-      const shown=side===0 ? display(linear) : display(encode(linear));
-      const grad=ctx.createLinearGradient(0,top,0,bottom);
-      grad.addColorStop(0,'rgb('+byte(shown*.9)+','+byte(shown*.7)+','+byte(shown*.3)+')');
-      grad.addColorStop(1,'rgb('+byte(shown*.18)+','+byte(shown*.13)+','+byte(shown*.055)+')');
-      ctx.fillStyle=grad;
-      ctx.fillRect(ox+x,top,1,bottom-top);
-    }
-  }
-
-  small('near',20,485);
-  small('far',mid-20,485,'right');
-  small('near',mid+20,485);
-  small('far',canvas.width-20,485,'right');
-
-  leftTitle.textContent='Light attenuation';
-  leftText.textContent='没有正确 Gamma 工作流时，平方衰减会被显示响应再次压暗，看起来衰减过快，因此旧场景常用 1/distance 取得视觉补偿。';
-  formula.textContent='legacy: 1 / d\nlinear workflow: 1 / d²\nfinal output: pow(color, 1/gamma)';
-  modeText.textContent='右边保持在线性空间计算 1/d²，只在最后编码；这对应官方示例开启 Gamma 后使用的衰减。';
+ gl.enable(gl.SCISSOR_TEST);gl.scissor(half-1,0,2,canvas.height);
+ gl.clearColor(.55,.58,.64,1);gl.clear(gl.COLOR_BUFFER_BIT);
+ gl.disable(gl.SCISSOR_TEST);
+ requestAnimationFrame(frame);
 }
-
-function drawTexture(){
-  clear();
-  const mid=canvas.width/2, top=70, h=390;
-  label('sRGB 值直接参与 Lighting',mid/2,40,'center');
-  label('sRGB decode → Linear Lighting',mid+mid/2,40,'center');
-
-  for(let y=0;y<h;y++){
-    for(let x=0;x<mid;x+=2){
-      const u=x/mid, v=y/h;
-      const grain=.5+.5*Math.sin(u*60+Math.sin(v*11)*2.5);
-      const stored=.18+.62*grain;
-      const light=.25+.75*(1-u);
-
-      const wrong=Math.min(1,stored*light*exposure);
-
-      const decoded=Math.pow(stored,gamma);
-      const lit=Math.min(1,decoded*light*exposure);
-      const correct=encode(lit);
-
-      ctx.fillStyle='rgb('+byte(wrong*.95)+','+byte(wrong*.52)+','+byte(wrong*.18)+')';
-      ctx.fillRect(x,top,2,h);
-
-      ctx.fillStyle='rgb('+byte(correct*.95)+','+byte(correct*.52)+','+byte(correct*.18)+')';
-      ctx.fillRect(mid+x,top,2,h);
-    }
-  }
-
-  leftTitle.textContent='sRGB texture input';
-  leftText.textContent='Albedo / diffuse 这类颜色纹理通常需要先解码到线性空间；normal、roughness、metallic 等数据纹理不应该套用 sRGB 解码。';
-  formula.textContent='linearTex = srgbTex^gamma\nlighting in linear\noutput = color^(1/gamma)';
-  modeText.textContent='两边使用同一组存储值。右边先把颜色纹理解码到 Linear，再做乘法，最后重新编码。';
-}
-
-function draw(){
-  if(mode==='gray')drawGray();
-  else if(mode==='light')drawLight();
-  else drawTexture();
-}
-draw();
+requestAnimationFrame(frame);
 })();
