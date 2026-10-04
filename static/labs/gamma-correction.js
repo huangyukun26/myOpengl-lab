@@ -1,5 +1,7 @@
 (()=>{
-const canvas=document.getElementById('gl');
+function boot(){
+const canvas=document.getElementById('gl') || document.getElementById('view');
+if(!canvas){console.error('Gamma Correction Lab: canvas not found');return;}
 const gl=canvas.getContext('webgl2',{antialias:true});
 if(!gl){document.body.innerHTML='<p style="padding:24px">需要支持 WebGL2 的浏览器。</p>';return;}
 
@@ -204,4 +206,7 @@ function frame(t){
  requestAnimationFrame(frame);
 }
 requestAnimationFrame(frame);
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
+else boot();
 })();
