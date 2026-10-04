@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gamma Correction Lab</title>
+<style>
+:root{color-scheme:light dark;--bg:#f5f7fa;--panel:#fff;--card:#f8fafc;--text:#172033;--muted:#667085;--border:#d9e1eb;--accent:#d7a62a}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1117;--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:18px}.head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end}.head h1{font-size:22px;margin:0}.head p{font-size:13px;color:var(--muted);margin:5px 0 0;line-height:1.6}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}.tabs button{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:9px;padding:8px 11px;cursor:pointer}.tabs button.active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+.stage{margin-top:14px;border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:14px}
+canvas{display:block;width:100%;aspect-ratio:16/7;border-radius:12px;background:#111}
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.ctl{display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--card);border-radius:9px;padding:7px 9px;font-size:12px;color:var(--muted)}.ctl input{width:150px}.ctl span{min-width:48px;text-align:right;color:var(--text)}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.card{border:1px solid var(--border);background:var(--panel);border-radius:14px;padding:14px}.card h2{font-size:15px;margin:0 0 8px}.card p,.card pre{font-size:12px;line-height:1.7;color:var(--muted);margin:0}.card pre{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--card);border:1px solid var(--border);padding:10px;border-radius:10px;margin-top:8px}
+@media(max-width:760px){.head{align-items:flex-start;flex-direction:column}.info{grid-template-columns:1fr}.ctl input{width:100px}}
+</style></head><body><div class="wrap">
+<div class="head">
+<div><h1>Gamma Correction Lab</h1><p>三个视图分别检查最终输出编码、光照衰减和 sRGB 纹理输入。</p></div>
+<div class="tabs"><button class="tab active" data-mode="gray">灰阶编码</button><button class="tab" data-mode="light">光照衰减</button><button class="tab" data-mode="texture">纹理输入</button></div>
+</div>
+<section class="stage">
+<canvas id="view" width="1200" height="525"></canvas>
+<div class="controls">
+<label class="ctl">Gamma <input id="gamma" type="range" min="1.6" max="2.6" step="0.05" value="2.2"><span id="gammaVal">2.20</span></label>
+<label class="ctl">曝光/强度 <input id="exposure" type="range" min="0.3" max="2.0" step="0.05" value="1.0"><span id="exposureVal">1.00</span></label>
+</div>
+</section>
+<div class="info">
+<section class="card"><h2 id="leftTitle">Linear value → display</h2><p id="leftText">左半边直接把线性值送到显示端；右半边先做逆 Gamma 编码。中间亮度的差异最明显。</p><pre id="formula">encoded = pow(linear, 1.0 / gamma)</pre></section>
+<section class="card"><h2>当前视图</h2><p id="modeText">灰阶从 0 到 1。标记线显示 linear 0.5 在未校正和校正后的显示位置差异。</p></section>
+</div>
+</div><script src="gamma-correction.js"></script></body></html>
