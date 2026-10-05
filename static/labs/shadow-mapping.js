@@ -62,12 +62,29 @@ const debugFS=['#version 300 es','precision highp float;in vec2 uv;uniform sampl
 const depthP=prog(depthVS,depthFS),sceneP=prog(sceneVS,sceneFS),debugP=prog(debugVS,debugFS);
 
 const cubeData=new Float32Array([
--1,-1,-1, 0,0,-1, 1,1,-1,0,0,-1, 1,-1,-1,0,0,-1, 1,1,-1,0,0,-1,-1,-1,-1,0,0,-1,-1,1,-1,0,0,-1,
--1,-1,1,0,0,1, 1,-1,1,0,0,1, 1,1,1,0,0,1, 1,1,1,0,0,1,-1,1,1,0,0,1,-1,-1,1,0,0,1,
--1,1,1,-1,0,0,-1,1,-1,-1,0,0,-1,-1,-1,-1,0,0,-1,-1,-1,-1,0,0,-1,-1,-1,1,-1,0,0,-1,-1,1,1,-1,0,0,
-1,1,1,1,0,0, 1,-1,-1,1,0,0, 1,1,-1,1,0,0, 1,-1,-1,1,0,0, 1,1,1,1,0,0, 1,-1,1,1,0,0,
--1,-1,-1,0,-1,0, 1,-1,-1,0,-1,0, 1,-1,1,0,-1,0, 1,-1,1,0,-1,0,-1,-1,1,0,-1,0,-1,-1,-1,0,-1,0,
--1,1,-1,0,1,0, -1,1,1,0,1,0, 1,1,1,0,1,0, 1,1,1,0,1,0, 1,1,-1,0,1,0,-1,1,-1,0,1,0
+  // back (-Z)
+  -1,-1,-1, 0,0,-1,   1,-1,-1, 0,0,-1,   1, 1,-1, 0,0,-1,
+   1, 1,-1, 0,0,-1,  -1, 1,-1, 0,0,-1,  -1,-1,-1, 0,0,-1,
+
+  // front (+Z)
+  -1,-1, 1, 0,0, 1,   1, 1, 1, 0,0, 1,   1,-1, 1, 0,0, 1,
+  -1,-1, 1, 0,0, 1,  -1, 1, 1, 0,0, 1,   1, 1, 1, 0,0, 1,
+
+  // left (-X)
+  -1,-1,-1,-1,0,0,   -1, 1,-1,-1,0,0,   -1, 1, 1,-1,0,0,
+  -1,-1,-1,-1,0,0,   -1, 1, 1,-1,0,0,   -1,-1, 1,-1,0,0,
+
+  // right (+X)
+   1,-1,-1, 1,0,0,    1, 1, 1, 1,0,0,    1, 1,-1, 1,0,0,
+   1,-1,-1, 1,0,0,    1,-1, 1, 1,0,0,    1, 1, 1, 1,0,0,
+
+  // bottom (-Y)
+  -1,-1,-1,0,-1,0,   -1,-1, 1,0,-1,0,    1,-1, 1,0,-1,0,
+  -1,-1,-1,0,-1,0,    1,-1, 1,0,-1,0,    1,-1,-1,0,-1,0,
+
+  // top (+Y)
+  -1, 1,-1,0,1,0,     1, 1, 1,0,1,0,    -1, 1, 1,0,1,0,
+  -1, 1,-1,0,1,0,     1, 1,-1,0,1,0,     1, 1, 1,0,1,0
 ]);
 const cubeVAO=gl.createVertexArray();gl.bindVertexArray(cubeVAO);
 const cb=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,cb);gl.bufferData(gl.ARRAY_BUFFER,cubeData,gl.STATIC_DRAW);
@@ -109,9 +126,9 @@ function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]}
 function lookAt(e,c,u){const z=norm(sub(e,c)),x=norm(cross(u,z)),y=cross(z,x);return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,e),-dot(y,e),-dot(z,e),1])}
 
 const objects=[
- {vao:planeVAO,count:6,model:id(),color:[0.52,0.54,0.58]},
- {vao:cubeVAO,count:36,model:mul(translate(0,1.0,0),scale(0.75,1.0,0.75)),color:[0.90,0.25,0.20]},
- {vao:cubeVAO,count:36,model:mul(translate(2.1,0.55,1.15),scale(0.55,0.55,0.55)),color:[0.18,0.45,0.92]}
+ {vao:planeVAO,count:6,model:id(),color:[0.55,0.57,0.60]},
+ {vao:cubeVAO,count:36,model:mul(translate(-0.65,0.75,0.0),scale(0.75,0.75,0.75)),color:[0.90,0.28,0.20]},
+ {vao:cubeVAO,count:36,model:mul(translate(1.55,0.45,1.10),scale(0.45,0.45,0.45)),color:[0.18,0.45,0.92]}
 ];
 
 let mode='final',bias=.010,lightX=-2,pcf=true,animate=false;
