@@ -37,19 +37,22 @@ const sceneFS=['#version 300 es','precision highp float;',
 ' p=p*0.5+0.5;',
 ' if(p.z>1.0)return 0.0;',
 ' if(p.x<0.0||p.x>1.0||p.y<0.0||p.y>1.0)return 0.0;',
+' vec3 N=normalize(Normal);',
+' vec3 L=normalize(uLightPos-FragPos);',
+' float bias=max(uBias*(1.0-dot(N,L)),uBias*0.25);',
 ' float current=p.z;',
-' if(uPCF==0){float d=texture(uShadow,p.xy).r;return current-uBias>d?1.0:0.0;}',
+' if(uPCF==0){float d=texture(uShadow,p.xy).r;return current-bias>d?1.0:0.0;}',
 ' vec2 ts=1.0/vec2(textureSize(uShadow,0));float s=0.0;',
-' for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++){float d=texture(uShadow,p.xy+vec2(x,y)*ts).r;s+=current-uBias>d?1.0:0.0;}',
+' for(int x=-1;x<=1;x++)for(int y=-1;y<=1;y++){float d=texture(uShadow,p.xy+vec2(x,y)*ts).r;s+=current-bias>d?1.0:0.0;}',
 ' return s/9.0;',
 '}',
 'void main(){',
 ' float shadow=shadowCalc();',
 ' if(uMode==2){FragColor=vec4(vec3(shadow),1.0);return;}',
 ' vec3 N=normalize(Normal);vec3 L=normalize(uLightPos-FragPos);vec3 V=normalize(uViewPos-FragPos);',
-' float diff=max(dot(N,L),0.0);vec3 H=normalize(L+V);float spec=pow(max(dot(N,H),0.0),48.0);',
+' float diff=max(dot(N,L),0.0);',
 ' vec3 base=uBaseColor;',
-' vec3 color=(0.20+(1.0-shadow)*(0.75*diff+0.28*spec))*base;',
+' vec3 color=(0.22+(1.0-shadow)*0.78*diff)*base;',
 ' FragColor=vec4(color,1.0);',
 '}'].join('\n');
 
@@ -106,14 +109,13 @@ function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]}
 function lookAt(e,c,u){const z=norm(sub(e,c)),x=norm(cross(u,z)),y=cross(z,x);return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,e),-dot(y,e),-dot(z,e),1])}
 
 const objects=[
- {vao:planeVAO,count:6,model:id(),color:[0.48,0.50,0.54]},
- {vao:cubeVAO,count:36,model:mul(translate(0,1.0,0),scale(.7,1.0,.7)),color:[0.88,0.24,0.20]},
- {vao:cubeVAO,count:36,model:mul(translate(2,.55,1.2),scale(.55,.55,.55)),color:[0.18,0.68,0.34]},
- {vao:cubeVAO,count:36,model:mul(translate(-1.4,.4,2.1),scale(.4,.4,.4)),color:[0.20,0.42,0.92]}
+ {vao:planeVAO,count:6,model:id(),color:[0.52,0.54,0.58]},
+ {vao:cubeVAO,count:36,model:mul(translate(0,1.0,0),scale(0.75,1.0,0.75)),color:[0.90,0.25,0.20]},
+ {vao:cubeVAO,count:36,model:mul(translate(2.1,0.55,1.15),scale(0.55,0.55,0.55)),color:[0.18,0.45,0.92]}
 ];
 
-let mode='final',bias=.006,lightX=-2,pcf=true,animate=false;
-let yaw=42*Math.PI/180,pitch=23*Math.PI/180,distance=8.5;
+let mode='final',bias=.010,lightX=-2,pcf=true,animate=false;
+let yaw=38*Math.PI/180,pitch=24*Math.PI/180,distance=9.0;
 let dragging=false,lastX=0,lastY=0;
 canvas.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);});
 canvas.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;yaw-=dx*.008;pitch=Math.max(-0.05,Math.min(1.35,pitch-dy*.008));});
