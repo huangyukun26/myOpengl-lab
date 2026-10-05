@@ -14,7 +14,7 @@
 @media(max-width:760px){.head{align-items:flex-start;flex-direction:column}.info{grid-template-columns:1fr}.ctl input{width:100px}}
 </style></head><body><div class="wrap">
 <div class="head">
-<div><h1>Shadow Mapping Lab</h1><p>拖拽旋转视角，滚轮缩放；切换最终阴影、Depth Map 和 Shadow Test。</p></div>
+<div><h1>Shadow Mapping Lab</h1><p>拖拽旋转视角，滚轮缩放。可查看最终阴影、Depth Map 和 Shadow Test。</p></div>
 <div class="tabs">
 <button class="tab active" data-mode="final">最终阴影</button>
 <button class="tab" data-mode="depth">Depth Map</button>
@@ -30,8 +30,8 @@
 </div>
 </section>
 <div class="info">
-<section class="card"><h2 id="modeTitle">最终阴影</h2><p id="modeText">第二遍从相机渲染时，用当前片段在 Light Space 的深度去查 Shadow Map。</p><pre>currentDepth - bias > closestDepth
+<section class="card"><h2 id="modeTitle">最终阴影</h2><p id="modeText">第二遍渲染中，片段先转换到 Light Space，再与 Shadow Map 中记录的最近深度比较。</p><pre>currentDepth - bias > closestDepth
 → shadow</pre></section>
-<section class="card"><h2>操作</h2><p>拖拽：旋转相机。滚轮：缩放。灰色地板、一个红色实心立方体和一个蓝色实心立方体。</p></section>
+<section class="card"><h2>操作</h2><p>拖拽旋转相机，滚轮缩放。场景使用灰色地板、红色立方体和蓝色立方体。</p></section>
 </div>
 </div><script src="shadow-mapping.js?v=4"></script></body></html>
