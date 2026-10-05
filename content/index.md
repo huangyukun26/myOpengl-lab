@@ -28,9 +28,10 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 ### Advanced Lighting
 
 [[learn/05-advanced-lighting/01-advanced-lighting|01 · Advanced Lighting 高级光照]]  
-[[learn/05-advanced-lighting/02-gamma-correction|02 · Gamma Correction Gamma 校正]]
+[[learn/05-advanced-lighting/02-gamma-correction|02 · Gamma Correction Gamma 校正]]  
+[[learn/05-advanced-lighting/03-shadow-mapping|03 · Shadow Mapping 阴影映射]]
 
-当前章节：**Gamma Correction**。处理 sRGB 输入、线性光照计算与最终显示编码之间的转换关系。ng 镜面高光的反射向量问题出发，引入 Blinn-Phong 的 Halfway Vector，重点理解两种模型如何用不同的几何关系计算 Specular。
+当前章节：**Shadow Mapping**。先从光源视角生成深度图，再在相机渲染时比较当前片段深度与光源记录的最近深度。ng 镜面高光的反射向量问题出发，引入 Blinn-Phong 的 Halfway Vector，重点理解两种模型如何用不同的几何关系计算 Specular。
 
 ## Interactive Labs
 
@@ -45,6 +46,7 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 <form action="/myOpengl-lab/static/labs/anti-aliasing.html" method="get"><button type="submit">🎮 Anti Aliasing Lab · 1x / MSAA / Resolve</button></form>
 <form action="/myOpengl-lab/static/labs/advanced-lighting.html" method="get"><button type="submit">🎮 Advanced Lighting Lab · Phong / Blinn-Phong</button></form>
 <form action="/myOpengl-lab/static/labs/gamma-correction.html" method="get"><button type="submit">🎮 Gamma Correction Lab · Linear / sRGB / Attenuation</button></form>
+<form action="/myOpengl-lab/static/labs/shadow-mapping.html" method="get"><button type="submit">🎮 Shadow Mapping Lab · Depth / Bias / PCF</button></form>
 
 ## Notes
 
