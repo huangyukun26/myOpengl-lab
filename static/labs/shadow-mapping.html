@@ -8,20 +8,20 @@
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
 .wrap{max-width:1180px;margin:auto;padding:18px}.head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end}.head h1{font-size:22px;margin:0}.head p{font-size:13px;color:var(--muted);margin:5px 0 0}
 .tabs,.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tabs button,.controls button{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:9px;padding:8px 11px;cursor:pointer}.tabs button.active,.controls button.active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
-.stage{margin-top:14px;border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:14px}canvas{display:block;width:100%;aspect-ratio:16/8;border-radius:12px;background:#111}
+.stage{margin-top:14px;border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:14px}canvas{display:block;width:100%;aspect-ratio:16/8;border-radius:12px;background:#111;cursor:grab;touch-action:none}canvas:active{cursor:grabbing}
 .controls{margin-top:12px}.ctl{display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--card);border-radius:9px;padding:7px 9px;font-size:12px;color:var(--muted)}.ctl input{width:150px}.ctl span{min-width:48px;text-align:right;color:var(--text)}
 .info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.card{border:1px solid var(--border);background:var(--panel);border-radius:14px;padding:14px}.card h2{font-size:15px;margin:0 0 8px}.card p,.card pre{font-size:12px;line-height:1.7;color:var(--muted);margin:0}.card pre{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--card);border:1px solid var(--border);padding:10px;border-radius:10px;margin-top:8px}
 @media(max-width:760px){.head{align-items:flex-start;flex-direction:column}.info{grid-template-columns:1fr}.ctl input{width:100px}}
 </style></head><body><div class="wrap">
 <div class="head">
-<div><h1>Shadow Mapping Lab</h1><p>同一场景切换最终阴影、Depth Map 和 Shadow Test。</p></div>
+<div><h1>Shadow Mapping Lab</h1><p>拖拽旋转视角，滚轮缩放；切换最终阴影、Depth Map 和 Shadow Test。</p></div>
 <div class="tabs">
 <button class="tab active" data-mode="final">最终阴影</button>
 <button class="tab" data-mode="depth">Depth Map</button>
 <button class="tab" data-mode="test">Shadow Test</button>
 </div></div>
 <section class="stage">
-<canvas id="gl" width="1200" height="600"></canvas>
+<canvas id="gl" width="1200" height="600" aria-label="Shadow Mapping interactive scene"></canvas>
 <div class="controls">
 <label class="ctl">Bias <input id="bias" type="range" min="0" max="0.04" step="0.001" value="0.006"><span id="biasVal">0.006</span></label>
 <label class="ctl">光源 X <input id="light" type="range" min="-4" max="4" step="0.1" value="-2"><span id="lightVal">-2.0</span></label>
@@ -32,6 +32,6 @@
 <div class="info">
 <section class="card"><h2 id="modeTitle">最终阴影</h2><p id="modeText">第二遍从相机渲染时，用当前片段在 Light Space 的深度去查 Shadow Map。</p><pre>currentDepth - bias > closestDepth
 → shadow</pre></section>
-<section class="card"><h2>观察</h2><p>把 Bias 拉到 0，容易看到表面自阴影；把 Bias 拉高，阴影会逐渐离开物体。关闭 PCF 可以直接看到硬边缘。</p></section>
+<section class="card"><h2>操作</h2><p>拖拽：旋转相机。滚轮：缩放。灰色地板和三个纯色立方体便于区分几何、受光面和投影阴影。</p></section>
 </div>
-</div><script src="shadow-mapping.js"></script></body></html>
+</div><script src="shadow-mapping.js?v=2"></script></body></html>
