@@ -48,6 +48,3 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 <form action="/myOpengl-lab/static/labs/gamma-correction.html" method="get"><button type="submit">🎮 Gamma Correction Lab · Linear / sRGB / Attenuation</button></form>
 <form action="/myOpengl-lab/static/labs/shadow-mapping.html" method="get"><button type="submit">🎮 Shadow Mapping Lab · Depth / Bias / PCF</button></form>
 
-## Notes
-
-[[notes/|Notes]] 为公开笔记区；主要学习笔记保留在本地 Obsidian。
