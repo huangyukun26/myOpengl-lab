@@ -23,7 +23,7 @@
 <section class="stage">
 <canvas id="gl" width="1200" height="600" aria-label="Shadow Mapping interactive scene"></canvas>
 <div class="controls">
-<label class="ctl">Bias <input id="bias" type="range" min="0" max="0.04" step="0.001" value="0.006"><span id="biasVal">0.006</span></label>
+<label class="ctl">Bias <input id="bias" type="range" min="0" max="0.04" step="0.001" value="0.010"><span id="biasVal">0.010</span></label>
 <label class="ctl">光源 X <input id="light" type="range" min="-4" max="4" step="0.1" value="-2"><span id="lightVal">-2.0</span></label>
 <button id="pcf" class="active">PCF 3×3</button>
 <button id="animate">移动光源</button>
@@ -32,6 +32,6 @@
 <div class="info">
 <section class="card"><h2 id="modeTitle">最终阴影</h2><p id="modeText">第二遍从相机渲染时，用当前片段在 Light Space 的深度去查 Shadow Map。</p><pre>currentDepth - bias > closestDepth
 → shadow</pre></section>
-<section class="card"><h2>操作</h2><p>拖拽：旋转相机。滚轮：缩放。灰色地板和三个纯色立方体便于区分几何、受光面和投影阴影。</p></section>
+<section class="card"><h2>操作</h2><p>拖拽：旋转相机。滚轮：缩放。灰色地板和两个纯色立方体，方便直接看受光面和投影阴影。</p></section>
 </div>
-</div><script src="shadow-mapping.js?v=2"></script></body></html>
+</div><script src="shadow-mapping.js?v=3"></script></body></html>
