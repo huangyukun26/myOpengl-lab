@@ -10,11 +10,9 @@ tags:
 
 # Shadow Mapping 阴影映射
 
-## 阴影到底在判断什么
+## 阴影判断
 
-阴影不是“把背光面变黑”。
-
-真正的问题是：**当前片段和光源之间，有没有别的东西挡住光。**
+一个片段是否处于阴影中，取决于它与光源之间是否存在遮挡物。
 
 ~~~text
 Light
@@ -28,7 +26,7 @@ Light
 Floor
 ~~~
 
-站在相机这里，我们只知道片段的位置、法线和材质。要判断它能不能看到光源，需要换到光源视角。
+判断遮挡关系时，需要把片段放到光源视角下处理。
 
 ~~~text
 先让光源看一遍场景
@@ -42,7 +40,7 @@ Floor
 和刚才记录的最近深度比较
 ~~~
 
-这张“光源眼里最近深度”的纹理，就是 Shadow Map。
+第一遍渲染得到的深度纹理就是 Shadow Map。
 
 ## 第一遍：从光源视角只画深度
 
@@ -150,7 +148,7 @@ lighting =
 
 Ambient 通常不乘阴影，因为这里的 Ambient 本来就是一个粗略的环境光近似。
 
-## Bias：为什么地面会自己挡住自己
+## Bias 与 Shadow Acne
 
 理论上同一个表面应该有：
 
@@ -180,7 +178,7 @@ float bias =
 
 Bias 太小会出现 Acne；Bias 太大时阴影会从物体脚下脱开，形成 Peter Panning。
 
-## PCF：为什么阴影边缘会变软
+## PCF
 
 Shadow Map 是有限分辨率纹理。如果每个片段只查一个 texel，阴影边界会跟着纹素一格一格跳。
 
@@ -240,9 +238,7 @@ Shadow Test
 Lighting
 ~~~
 
-Shadow Mapping 最核心的判断就是：
-
-> **先记录光源看到的最近深度，再检查当前片段在光源眼里是不是被更近的东西挡住。**
+Shadow Mapping 的判断依据是光源视角下的两份深度：Shadow Map 中保存的最近深度，以及当前片段自己的深度。
 
 ## Interactive Lab
 
@@ -250,4 +246,4 @@ Shadow Mapping 最核心的判断就是：
   <button type="submit">🎮 Shadow Mapping Lab</button>
 </form>
 
-Lab 可以在最终阴影、Depth Map、Shadow Test 三种视图之间切换，并调 Bias、PCF 和光源位置。
+Lab 提供最终阴影、Depth Map、Shadow Test 三种视图，并可调整 Bias、PCF 和光源位置。
