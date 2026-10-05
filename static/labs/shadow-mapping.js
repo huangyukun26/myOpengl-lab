@@ -31,10 +31,12 @@ const sceneFS=['#version 300 es','precision highp float;',
 'uniform float uBias;',
 'uniform int uPCF;',
 'uniform int uMode;',
+'uniform vec3 uBaseColor;',
 'float shadowCalc(){',
 ' vec3 p=FragPosLight.xyz/FragPosLight.w;',
 ' p=p*0.5+0.5;',
 ' if(p.z>1.0)return 0.0;',
+' if(p.x<0.0||p.x>1.0||p.y<0.0||p.y>1.0)return 0.0;',
 ' float current=p.z;',
 ' if(uPCF==0){float d=texture(uShadow,p.xy).r;return current-uBias>d?1.0:0.0;}',
 ' vec2 ts=1.0/vec2(textureSize(uShadow,0));float s=0.0;',
@@ -46,8 +48,7 @@ const sceneFS=['#version 300 es','precision highp float;',
 ' if(uMode==2){FragColor=vec4(vec3(shadow),1.0);return;}',
 ' vec3 N=normalize(Normal);vec3 L=normalize(uLightPos-FragPos);vec3 V=normalize(uViewPos-FragPos);',
 ' float diff=max(dot(N,L),0.0);vec3 H=normalize(L+V);float spec=pow(max(dot(N,H),0.0),48.0);',
-' vec3 base=vec3(0.54,0.34,0.18);',
-' float checker=mod(floor(FragPos.x*2.0)+floor(FragPos.z*2.0),2.0);base*=mix(0.82,1.08,checker);',
+' vec3 base=uBaseColor;',
 ' vec3 color=(0.20+(1.0-shadow)*(0.75*diff+0.28*spec))*base;',
 ' FragColor=vec4(color,1.0);',
 '}'].join('\n');
@@ -105,13 +106,20 @@ function dot(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]}
 function lookAt(e,c,u){const z=norm(sub(e,c)),x=norm(cross(u,z)),y=cross(z,x);return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-dot(x,e),-dot(y,e),-dot(z,e),1])}
 
 const objects=[
- {vao:planeVAO,count:6,model:id()},
- {vao:cubeVAO,count:36,model:mul(translate(0,1.0,0),scale(.7,1.0,.7))},
- {vao:cubeVAO,count:36,model:mul(translate(2,.55,1.2),scale(.55,.55,.55))},
- {vao:cubeVAO,count:36,model:mul(translate(-1.4,.4,2.1),scale(.4,.4,.4))}
+ {vao:planeVAO,count:6,model:id(),color:[0.48,0.50,0.54]},
+ {vao:cubeVAO,count:36,model:mul(translate(0,1.0,0),scale(.7,1.0,.7)),color:[0.88,0.24,0.20]},
+ {vao:cubeVAO,count:36,model:mul(translate(2,.55,1.2),scale(.55,.55,.55)),color:[0.18,0.68,0.34]},
+ {vao:cubeVAO,count:36,model:mul(translate(-1.4,.4,2.1),scale(.4,.4,.4)),color:[0.20,0.42,0.92]}
 ];
 
 let mode='final',bias=.006,lightX=-2,pcf=true,animate=false;
+let yaw=42*Math.PI/180,pitch=23*Math.PI/180,distance=8.5;
+let dragging=false,lastX=0,lastY=0;
+canvas.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;yaw-=dx*.008;pitch=Math.max(-0.05,Math.min(1.35,pitch-dy*.008));});
+canvas.addEventListener('pointerup',e=>{dragging=false;if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);});
+canvas.addEventListener('pointercancel',()=>dragging=false);
+canvas.addEventListener('wheel',e=>{e.preventDefault();distance=Math.max(4.2,Math.min(15,distance*Math.exp(e.deltaY*.001)));},{passive:false});
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode;sync();});
 document.getElementById('bias').oninput=e=>{bias=+e.target.value;document.getElementById('biasVal').textContent=bias.toFixed(3);};
 document.getElementById('light').oninput=e=>{lightX=+e.target.value;document.getElementById('lightVal').textContent=lightX.toFixed(1);};
@@ -126,6 +134,7 @@ function drawObjects(program,useDepth,lightSpace,vp,lightPos){
    gl.uniformMatrix4fv(gl.getUniformLocation(program,'uModel'),false,o.model);
    gl.uniformMatrix4fv(gl.getUniformLocation(program,'uVP'),false,vp);
    gl.uniformMatrix4fv(gl.getUniformLocation(program,'uLightSpace'),false,lightSpace);
+   gl.uniform3fv(gl.getUniformLocation(program,'uBaseColor'),o.color);
   }
   gl.bindVertexArray(o.vao);gl.drawArrays(gl.TRIANGLES,0,o.count);
  }
@@ -146,7 +155,9 @@ function frame(t){
  if(mode==='depth'){
   gl.disable(gl.DEPTH_TEST);gl.useProgram(debugP);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,depthTex);gl.uniform1i(gl.getUniformLocation(debugP,'uDepth'),0);gl.bindVertexArray(quadVAO);gl.drawArrays(gl.TRIANGLES,0,6);gl.enable(gl.DEPTH_TEST);
  }else{
-  const eye=[5.2,3.5,6.2];const vp=mul(perspective(47*Math.PI/180,canvas.width/canvas.height,.1,50),lookAt(eye,[0,.5,0],[0,1,0]));
+  const target=[0,.65,.35];
+  const eye=[target[0]+distance*Math.cos(pitch)*Math.sin(yaw),target[1]+distance*Math.sin(pitch),target[2]+distance*Math.cos(pitch)*Math.cos(yaw)];
+  const vp=mul(perspective(47*Math.PI/180,canvas.width/canvas.height,.1,50),lookAt(eye,target,[0,1,0]));
   gl.useProgram(sceneP);gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_2D,depthTex);gl.uniform1i(gl.getUniformLocation(sceneP,'uShadow'),0);
   gl.uniform3fv(gl.getUniformLocation(sceneP,'uLightPos'),lightPos);gl.uniform3fv(gl.getUniformLocation(sceneP,'uViewPos'),eye);
   gl.uniform1f(gl.getUniformLocation(sceneP,'uBias'),bias);gl.uniform1i(gl.getUniformLocation(sceneP,'uPCF'),pcf?1:0);gl.uniform1i(gl.getUniformLocation(sceneP,'uMode'),mode==='test'?2:0);
