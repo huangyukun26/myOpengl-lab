@@ -42,9 +42,9 @@ canvas{display:block;width:100%;aspect-ratio:16/8;border-radius:12px;background:
 </section>
 
 <div class="info">
-<section class="card"><h2 id="modeTitle">最终阴影</h2><p id="modeText">红色和蓝色立方体分别在点光源两侧，阴影方向随光源位置改变。</p><pre>fragToLight = fragPos - lightPos
+<section class="card"><h2 id="modeTitle">最终阴影</h2><p id="modeText">红色和蓝色立方体分别位于点光源两侧，阴影随光源位置变化。</p><pre>fragToLight = fragPos - lightPos
 direction → sample cubemap
 length    → currentDepth</pre></section>
 <section class="card"><h2>实现</h2><p>第一遍分别渲染 Cubemap 六个 face。第二遍用 fragToLight 直接采样深度 Cubemap。Soft PCF 在三维采样方向周围取 20 个样本。</p></section>
 </div>
-</div><script src="point-shadows.js"></script></body></html>
+</div><script src="point-shadows.js?v=2"></script></body></html>
