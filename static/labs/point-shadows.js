@@ -203,7 +203,8 @@ function lookAt(e,c,u){
 const scene=[
   {mesh:plane,model:id(),color:[0.52,0.54,0.58]},
   {mesh:cube,model:mul(translate(-1.65,.72,.15),scale(.72,.72,.72)),color:[0.90,0.24,0.18]},
-  {mesh:cube,model:mul(translate(1.65,.52,1.25),scale(.52,.52,.52)),color:[0.18,0.43,0.92]}
+  {mesh:cube,model:mul(translate(1.65,.52,1.25),scale(.52,.52,.52)),color:[0.18,0.43,0.92]},
+  {mesh:cube,model:mul(translate(.35,.60,-2.0),scale(.60,.60,.60)),color:[0.22,0.66,0.38]}
 ];
 
 let mode='final',bias=.08,lightX=0,soft=true,shadows=true,animate=false;
@@ -304,29 +305,54 @@ function frame(t){
   gl.clearColor(.045,.055,.075,1);gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
 
   if(mode==='depth'){
+    // 左侧：保留真实场景，让六张深度图有空间参照。
+    const leftX=18,leftY=18,leftW=Math.floor(canvas.width*0.40)-24,leftH=canvas.height-36;
+    gl.viewport(leftX,leftY,leftW,leftH);
+    gl.enable(gl.DEPTH_TEST);
+    const target=[0,.55,.15];
+    const eye=[target[0]+8.8*Math.cos(.42)*Math.sin(.72),target[1]+8.8*Math.sin(.42),target[2]+8.8*Math.cos(.42)*Math.cos(.72)];
+    const sceneVP=mul(perspective(47*Math.PI/180,leftW/leftH,.1,50),lookAt(eye,target,[0,1,0]));
+    drawSceneCamera(sceneVP,eye,lightPos);
+
+    // 右侧：把六个 Cubemap face 按常见十字展开排列。
     gl.disable(gl.DEPTH_TEST);
     gl.useProgram(debugP);
     gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_CUBE_MAP,depthCube);
     gl.uniform1i(gl.getUniformLocation(debugP,'uDepth'),0);
     gl.bindVertexArray(quadVAO);
 
-    const cols=3,rows=2;
-    const gap=14;
-    const cellW=Math.floor((canvas.width-gap*(cols+1))/cols);
-    const cellH=Math.floor((canvas.height-gap*(rows+1))/rows);
+    const areaX=Math.floor(canvas.width*0.43);
+    const areaW=canvas.width-areaX-18;
+    const gap=8;
+    const cell=Math.floor(Math.min((areaW-gap*5)/4,(canvas.height-gap*4)/3));
+    const startX=areaX+Math.floor((areaW-(cell*4+gap*3))/2);
+    const startY=Math.floor((canvas.height-(cell*3+gap*2))/2);
 
-    for(let i=0;i<6;i++){
-      const col=i%cols,row=Math.floor(i/cols);
-      const x=gap+col*(cellW+gap);
-      const y=canvas.height-gap-(row+1)*cellH-row*gap;
-      gl.viewport(x,y,cellW,cellH);
-      gl.uniform1i(gl.getUniformLocation(debugP,'uFace'),i);
+    // screen-row / column layout:
+    //          +Y
+    // -X  +Z  +X  -Z
+    //          -Y
+    const layout=[
+      {face:2,col:1,row:0},
+      {face:1,col:0,row:1},
+      {face:4,col:1,row:1},
+      {face:0,col:2,row:1},
+      {face:5,col:3,row:1},
+      {face:3,col:1,row:2}
+    ];
+
+    for(const item of layout){
+      const x=startX+item.col*(cell+gap);
+      const top=startY+item.row*(cell+gap);
+      const y=canvas.height-top-cell;
+      gl.viewport(x,y,cell,cell);
+      gl.uniform1i(gl.getUniformLocation(debugP,'uFace'),item.face);
       gl.drawArrays(gl.TRIANGLES,0,6);
 
-      const label=depthLabels.querySelector('[data-slot="'+i+'"]');
+      const label=depthLabels.querySelector('[data-slot="'+item.face+'"]');
       if(label){
         label.style.left=(x/canvas.width*100)+'%';
-        label.style.top=((canvas.height-(y+cellH))/canvas.height*100)+'%';
+        label.style.top=(top/canvas.height*100)+'%';
       }
     }
     gl.enable(gl.DEPTH_TEST);
