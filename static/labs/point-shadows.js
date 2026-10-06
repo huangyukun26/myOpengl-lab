@@ -123,8 +123,11 @@ const debugFS=['#version 300 es','precision highp float;',
 '  return vec3(-a.x,-a.y,-1.0);',
 '}',
 'void main(){',
-'  float d=texture(uDepth,dirForFace(uv)).r;',
-'  FragColor=vec4(vec3(d),1.0);',
+'  vec2 displayUV=vec2(uv.x,1.0-uv.y);',
+'  float d=texture(uDepth,dirForFace(displayUV)).r;',
+'  if(d>0.9999){FragColor=vec4(vec3(0.035),1.0);return;}',
+'  float v=clamp(d/0.45,0.0,1.0);',
+'  FragColor=vec4(vec3(0.12+0.88*v),1.0);',
 '}'].join('\n');
 
 const depthP=makeProgram(depthVS,depthFS);
