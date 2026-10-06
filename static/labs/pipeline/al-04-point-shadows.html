@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Point Shadows · Pipeline</title>
+<style>
+:root{color-scheme:light dark;--panel:#fff;--card:#f7f9fc;--text:#172033;--muted:#667085;--border:#d9e1eb;--accent:#4a8bd8}
+@media(prefers-color-scheme:dark){:root{--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49}}
+*{box-sizing:border-box}body{margin:0;background:transparent;color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:4px}.card{border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:16px}.card+.card{margin-top:14px}.title{font-size:13px;font-weight:700;margin-bottom:12px}
+.flow{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:10px;align-items:center}.box{border:1px solid var(--border);background:var(--card);border-radius:13px;padding:14px;text-align:center}.box.hot{border-color:var(--accent)}.box b{display:block;font-size:14px}.box span{display:block;font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px}.arr{font-size:20px;color:var(--accent)}
+.faces{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}.face{border:1px solid var(--border);background:var(--card);border-radius:10px;padding:12px;text-align:center;font-weight:700;font-size:13px}.note{font-size:12px;color:var(--muted);line-height:1.7;margin-top:10px}
+@media(max-width:760px){.flow{grid-template-columns:1fr}.arr{transform:rotate(90deg);text-align:center}.faces{grid-template-columns:repeat(3,1fr)}}
+</style></head><body><div class="wrap">
+<section class="card">
+<div class="title">Point Shadows · Depth Cubemap</div>
+<div class="flow">
+<div class="box hot"><b>Pass 1 · Point Light</b><span>同一位置<br>六个 90° 视图</span></div>
+<div class="arr">→</div>
+<div class="box hot"><b>Depth Cubemap</b><span>方向 → 最近距离</span></div>
+<div class="arr">→</div>
+<div class="box hot"><b>Pass 2 · Camera</b><span>fragToLight<br>方向采样 + 距离比较</span></div>
+</div>
+</section>
+<section class="card">
+<div class="faces"><div class="face">+X</div><div class="face">-X</div><div class="face">+Y</div><div class="face">-Y</div><div class="face">+Z</div><div class="face">-Z</div></div>
+<div class="note">每个 Cubemap face 保存一个方向上的最近距离。第二遍使用 fragPos - lightPos 直接查询 Cubemap，不再计算 2D Shadow Map UV。</div>
+</section>
+</div></body></html>
