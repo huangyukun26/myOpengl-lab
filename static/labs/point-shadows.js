@@ -126,8 +126,8 @@ const debugFS=['#version 300 es','precision highp float;',
 '  vec2 displayUV=vec2(uv.x,1.0-uv.y);',
 '  float d=texture(uDepth,dirForFace(displayUV)).r;',
 '  if(d>0.9999){FragColor=vec4(vec3(0.035),1.0);return;}',
-'  float v=clamp(d/0.45,0.0,1.0);',
-'  FragColor=vec4(vec3(0.12+0.88*v),1.0);',
+'  float v=smoothstep(0.02,0.55,d);',
+'  FragColor=vec4(vec3(0.10+0.90*v),1.0);',
 '}'].join('\n');
 
 const depthP=makeProgram(depthVS,depthFS);
@@ -206,9 +206,10 @@ const scene=[
   {mesh:cube,model:mul(translate(1.65,.52,1.25),scale(.52,.52,.52)),color:[0.18,0.43,0.92]}
 ];
 
-let mode='final',bias=.08,lightX=0,soft=true,shadows=true,animate=false,face=0;
+let mode='final',bias=.08,lightX=0,soft=true,shadows=true,animate=false;
 let yaw=42*Math.PI/180,pitch=25*Math.PI/180,distance=9.5;
 let dragging=false,lastX=0,lastY=0;
+const depthLabels=document.getElementById('depthLabels');
 
 canvas.addEventListener('pointerdown',e=>{dragging=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);});
 canvas.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-lastX,dy=e.clientY-lastY;lastX=e.clientX;lastY=e.clientY;yaw-=dx*.008;pitch=Math.max(-.02,Math.min(1.35,pitch-dy*.008));});
@@ -219,9 +220,6 @@ canvas.addEventListener('wheel',e=>{e.preventDefault();distance=Math.max(4.5,Mat
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));b.classList.add('active');mode=b.dataset.mode;syncCopy();
 });
-document.querySelectorAll('.face').forEach(b=>b.onclick=()=>{
-  document.querySelectorAll('.face').forEach(x=>x.classList.remove('active'));b.classList.add('active');face=+b.dataset.face;
-});
 document.getElementById('bias').oninput=e=>{bias=+e.target.value;document.getElementById('biasVal').textContent=bias.toFixed(2);};
 document.getElementById('lightX').oninput=e=>{lightX=+e.target.value;document.getElementById('lightXVal').textContent=lightX.toFixed(1);};
 document.getElementById('soft').onclick=e=>{soft=!soft;e.currentTarget.classList.toggle('active',soft);e.currentTarget.textContent=soft?'Soft PCF':'Hard Shadow';};
@@ -230,9 +228,18 @@ document.getElementById('animate').onclick=e=>{animate=!animate;e.currentTarget.
 
 function syncCopy(){
   const t=document.getElementById('modeTitle'),p=document.getElementById('modeText');
-  if(mode==='depth'){t.textContent='Depth Cubemap';p.textContent='选择 +X 到 -Z 查看六个深度 face。亮度表示归一化后的径向距离。';}
-  else if(mode==='test'){t.textContent='Shadow Test';p.textContent='白色表示当前距离比 Cubemap 中记录的最近距离更远。';}
-  else{t.textContent='最终阴影';p.textContent='红色和蓝色立方体位于点光源两侧，阴影从光源位置向外投射。';}
+  const isDepth=mode==='depth';
+  depthLabels.hidden=!isDepth;
+  if(isDepth){
+    t.textContent='Depth Cubemap';
+    p.textContent='六个方向同时显示。每格都是从点光源位置朝对应方向看到的最近距离。';
+  }else if(mode==='test'){
+    t.textContent='Shadow Test';
+    p.textContent='白色表示当前片段比 Cubemap 中记录的最近表面更远。';
+  }else{
+    t.textContent='最终阴影';
+    p.textContent='红色和蓝色立方体位于点光源两侧，阴影随光源位置变化。';
+  }
 }
 
 function drawMesh(program,obj){
@@ -301,8 +308,27 @@ function frame(t){
     gl.useProgram(debugP);
     gl.activeTexture(gl.TEXTURE0);gl.bindTexture(gl.TEXTURE_CUBE_MAP,depthCube);
     gl.uniform1i(gl.getUniformLocation(debugP,'uDepth'),0);
-    gl.uniform1i(gl.getUniformLocation(debugP,'uFace'),face);
-    gl.bindVertexArray(quadVAO);gl.drawArrays(gl.TRIANGLES,0,6);
+    gl.bindVertexArray(quadVAO);
+
+    const cols=3,rows=2;
+    const gap=14;
+    const cellW=Math.floor((canvas.width-gap*(cols+1))/cols);
+    const cellH=Math.floor((canvas.height-gap*(rows+1))/rows);
+
+    for(let i=0;i<6;i++){
+      const col=i%cols,row=Math.floor(i/cols);
+      const x=gap+col*(cellW+gap);
+      const y=canvas.height-gap-(row+1)*cellH-row*gap;
+      gl.viewport(x,y,cellW,cellH);
+      gl.uniform1i(gl.getUniformLocation(debugP,'uFace'),i);
+      gl.drawArrays(gl.TRIANGLES,0,6);
+
+      const label=depthLabels.querySelector('[data-slot="'+i+'"]');
+      if(label){
+        label.style.left=(x/canvas.width*100)+'%';
+        label.style.top=((canvas.height-(y+cellH))/canvas.height*100)+'%';
+      }
+    }
     gl.enable(gl.DEPTH_TEST);
   }else{
     const target=[0,.55,.2];
