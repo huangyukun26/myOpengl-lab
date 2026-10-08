@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Normal Mapping · Pipeline</title>
+<style>
+:root{color-scheme:light dark;--panel:#fff;--card:#f7f9fc;--text:#172033;--muted:#667085;--border:#d9e1eb;--accent:#5f86d9}
+@media(prefers-color-scheme:dark){:root{--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49}}
+*{box-sizing:border-box}body{margin:0;background:transparent;color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:4px}.card{border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:16px}.card+.card{margin-top:14px}.title{font-size:13px;font-weight:700;margin-bottom:12px}
+.flow{display:grid;grid-template-columns:1.1fr auto 1.1fr auto 1.2fr auto 1.1fr;gap:9px;align-items:center}.box{border:1px solid var(--border);background:var(--card);border-radius:13px;padding:13px;text-align:center}.box.hot{border-color:var(--accent)}.box b{display:block;font-size:14px}.box span{display:block;font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px}.arr{font-size:19px;color:var(--accent)}
+.axes{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.axis{border:1px solid var(--border);background:var(--card);border-radius:11px;padding:12px}.axis b{display:block;font-size:13px}.axis span{display:block;margin-top:5px;font-size:11px;line-height:1.5;color:var(--muted)}
+@media(max-width:800px){.flow{grid-template-columns:1fr}.arr{transform:rotate(90deg);text-align:center}.axes{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<section class="card"><div class="title">Normal Mapping · 数据流</div>
+<div class="flow">
+<div class="box hot"><b>Vertex Input</b><span>Position / Normal / UV / Tangent</span></div><div class="arr">→</div>
+<div class="box hot"><b>Vertex Shader</b><span>构造 TBN<br>World → Tangent</span></div><div class="arr">→</div>
+<div class="box hot"><b>Fragment Shader</b><span>Normal Map RGB<br>[0,1] → [-1,1]</span></div><div class="arr">→</div>
+<div class="box hot"><b>Lighting</b><span>normal / lightDir / viewDir<br>同一 Tangent Space</span></div>
+</div></section>
+<section class="card"><div class="axes">
+<div class="axis"><b>T · Tangent</b><span>沿纹理 U 方向</span></div>
+<div class="axis"><b>B · Bitangent</b><span>沿纹理 V 方向</span></div>
+<div class="axis"><b>N · Normal</b><span>离开表面的方向</span></div>
+</div></section>
+</div></body></html>
