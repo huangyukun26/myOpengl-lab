@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Normal Mapping Lab</title>
+<style>
+:root{color-scheme:light dark;--bg:#f5f7fa;--panel:#fff;--card:#f8fafc;--text:#172033;--muted:#667085;--border:#d9e1eb;--accent:#5f86d9}
+@media(prefers-color-scheme:dark){:root{--bg:#0d1117;--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:18px}.head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end}.head h1{font-size:22px;margin:0}.head p{font-size:13px;color:var(--muted);margin:5px 0 0}
+.tabs,.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tabs button,.controls button{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:9px;padding:8px 11px;cursor:pointer}.tabs button.active,.controls button.active{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+.stage{margin-top:14px;border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:14px}.canvasWrap{position:relative}
+canvas{display:block;width:100%;aspect-ratio:16/8;border-radius:12px;background:#0c1017;cursor:grab;touch-action:none}canvas:active{cursor:grabbing}
+.labels{position:absolute;inset:0;pointer-events:none}.labels span{position:absolute;top:10px;padding:5px 9px;border-radius:8px;background:rgba(10,14,20,.76);color:#fff;font-size:12px;font-weight:700}.labels .left{left:12px}.labels .right{left:calc(50% + 12px)}
+.controls{margin-top:12px}.ctl{display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--card);border-radius:9px;padding:7px 9px;font-size:12px;color:var(--muted)}.ctl input{width:140px}.ctl span{min-width:42px;text-align:right;color:var(--text)}
+.info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.card{border:1px solid var(--border);background:var(--panel);border-radius:14px;padding:14px}.card h2{font-size:15px;margin:0 0 8px}.card p,.card pre{font-size:12px;line-height:1.7;color:var(--muted);margin:0}.card pre{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--card);border:1px solid var(--border);padding:10px;border-radius:10px;margin-top:8px}
+@media(max-width:760px){.head{align-items:flex-start;flex-direction:column}.info{grid-template-columns:1fr}.ctl input{width:100px}}
+</style></head><body><div class="wrap">
+<div class="head">
+<div><h1>Normal Mapping Lab</h1><p>同一块平面使用同一张颜色纹理，对比固定几何法线和逐片段 Normal Map。</p></div>
+<div class="tabs">
+<button class="tab active" data-mode="compare">对比</button>
+<button class="tab" data-mode="normal">Normal Map</button>
+</div>
+</div>
+
+<section class="stage">
+<div class="canvasWrap">
+<canvas id="gl" width="1200" height="600"></canvas>
+<div id="compareLabels" class="labels"><span class="left">Normal Mapping OFF</span><span class="right">Normal Mapping ON</span></div>
+</div>
+<div class="controls">
+<label class="ctl">凹凸强度 <input id="strength" type="range" min="0" max="2.2" step="0.05" value="1"><span id="strengthVal">1.00</span></label>
+<label class="ctl">光源 X <input id="lightX" type="range" min="-2" max="2" step="0.05" value="0.7"><span id="lightXVal">0.70</span></label>
+<label class="ctl">光源 Y <input id="lightY" type="range" min="-1.5" max="1.8" step="0.05" value="0.9"><span id="lightYVal">0.90</span></label>
+<button id="animate">移动光源</button>
+<button id="reset">恢复视角</button>
+</div>
+</section>
+
+<div class="info">
+<section class="card"><h2 id="modeTitle">同一几何，不同法线</h2><p id="modeText">左侧整块平面使用几何法线；右侧每个 Fragment 从 Normal Map 读取自己的切线空间法线。</p><pre>normal = texture(normalMap, uv).rgb
+normal = normalize(normal * 2.0 - 1.0)</pre></section>
+<section class="card"><h2>Tangent Space</h2><p>拖拽旋转平面。右侧仍能保持正确凹凸光照，因为 Light、View 和 Fragment 位置都先转换到同一套 TBN 切线空间。</p></section>
+</div>
+</div><script src="normal-mapping.js"></script></body></html>
