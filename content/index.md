@@ -30,9 +30,10 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 [[learn/05-advanced-lighting/01-advanced-lighting|01 · Advanced Lighting 高级光照]]  
 [[learn/05-advanced-lighting/02-gamma-correction|02 · Gamma Correction Gamma 校正]]  
 [[learn/05-advanced-lighting/03-shadow-mapping|03 · Shadow Mapping 阴影映射]]  
-[[learn/05-advanced-lighting/04-point-shadows|04 · Point Shadows 点阴影]]
+[[learn/05-advanced-lighting/04-point-shadows|04 · Point Shadows 点阴影]]  
+[[learn/05-advanced-lighting/05-normal-mapping|05 · Normal Mapping 法线贴图]]
 
-当前章节：**Point Shadows**。点光源用 Depth Cubemap 保存六个方向的最近距离，第二遍用三维方向采样并比较径向深度。ng 镜面高光的反射向量问题出发，引入 Blinn-Phong 的 Halfway Vector，重点理解两种模型如何用不同的几何关系计算 Specular。
+当前章节：**Normal Mapping**。Normal Map 为每个 Fragment 提供切线空间法线，TBN 负责把法线、光源和观察方向放进同一坐标空间。nn-Phong 的 Halfway Vector，重点理解两种模型如何用不同的几何关系计算 Specular。
 
 ## Interactive Labs
 
@@ -49,4 +50,5 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 <form action="/myOpengl-lab/static/labs/gamma-correction.html" method="get"><button type="submit">🎮 Gamma Correction Lab · Linear / sRGB / Attenuation</button></form>
 <form action="/myOpengl-lab/static/labs/shadow-mapping.html" method="get"><button type="submit">🎮 Shadow Mapping Lab · Depth / Bias / PCF</button></form>
 <form action="/myOpengl-lab/static/labs/point-shadows.html" method="get"><button type="submit">🎮 Point Shadows Lab · Cubemap / PCF</button></form>
+<form action="/myOpengl-lab/static/labs/normal-mapping.html" method="get"><button type="submit">🎮 Normal Mapping Lab · TBN / Per-Fragment Normal</button></form>
 
