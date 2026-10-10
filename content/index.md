@@ -31,9 +31,10 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 [[learn/05-advanced-lighting/02-gamma-correction|02 · Gamma Correction Gamma 校正]]  
 [[learn/05-advanced-lighting/03-shadow-mapping|03 · Shadow Mapping 阴影映射]]  
 [[learn/05-advanced-lighting/04-point-shadows|04 · Point Shadows 点阴影]]  
-[[learn/05-advanced-lighting/05-normal-mapping|05 · Normal Mapping 法线贴图]]
+[[learn/05-advanced-lighting/05-normal-mapping|05 · Normal Mapping 法线贴图]]  
+[[learn/05-advanced-lighting/06-parallax-mapping|06 · Parallax Mapping 视差贴图]]
 
-当前章节：**Normal Mapping**。Normal Map 为每个 Fragment 提供切线空间法线，TBN 负责把法线、光源和观察方向放进同一坐标空间。nn-Phong 的 Halfway Vector，重点理解两种模型如何用不同的几何关系计算 Specular。
+当前章节：**Parallax Mapping**。Depth Map 和 Tangent Space 中的观察方向共同决定 UV 偏移；Steep Parallax 与 POM 通过分层搜索与插值提高交点估计精度。
 
 ## Interactive Labs
 
@@ -51,4 +52,5 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 <form action="/myOpengl-lab/static/labs/shadow-mapping.html" method="get"><button type="submit">🎮 Shadow Mapping Lab · Depth / Bias / PCF</button></form>
 <form action="/myOpengl-lab/static/labs/point-shadows.html" method="get"><button type="submit">🎮 Point Shadows Lab · Cubemap / PCF</button></form>
 <form action="/myOpengl-lab/static/labs/normal-mapping.html" method="get"><button type="submit">🎮 Normal Mapping Lab · TBN / Per-Fragment Normal</button></form>
+<form action="/myOpengl-lab/static/labs/parallax-mapping.html" method="get"><button type="submit">🎮 Parallax Mapping Lab · Basic / Steep / POM</button></form>
 
