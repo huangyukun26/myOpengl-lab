@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Parallax Mapping · Pipeline</title>
+<style>
+:root{color-scheme:light dark;--panel:#fff;--card:#f7f9fc;--text:#172033;--muted:#667085;--border:#d9e1eb;--accent:#7d68d8}
+@media(prefers-color-scheme:dark){:root{--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49}}
+*{box-sizing:border-box}body{margin:0;background:transparent;color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1180px;margin:auto;padding:4px}.card{border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:16px}.card+.card{margin-top:14px}.title{font-size:13px;font-weight:700;margin-bottom:12px}
+.flow{display:grid;grid-template-columns:1fr auto 1.1fr auto 1.1fr auto 1.1fr;gap:9px;align-items:center}.box{border:1px solid var(--border);background:var(--card);border-radius:13px;padding:13px;text-align:center}.box.hot{border-color:var(--accent)}.box b{display:block;font-size:14px}.box span{display:block;font-size:11px;color:var(--muted);line-height:1.5;margin-top:6px}.arr{font-size:19px;color:var(--accent)}
+@media(max-width:800px){.flow{grid-template-columns:1fr}.arr{transform:rotate(90deg);text-align:center}}
+</style></head><body><div class="wrap">
+<section class="card"><div class="title">Parallax Mapping · Fragment Shader 数据流</div>
+<div class="flow">
+<div class="box"><b>Interpolated UV</b><span>原始 TexCoords</span></div><div class="arr">→</div>
+<div class="box hot"><b>Depth Map</b><span>结合 Tangent View Direction<br>计算 UV Offset</span></div><div class="arr">→</div>
+<div class="box hot"><b>Adjusted UV</b><span>Basic / Steep / POM</span></div><div class="arr">→</div>
+<div class="box hot"><b>Material Sampling</b><span>Diffuse + Normal Map<br>使用同一新 UV</span></div>
+</div></section>
+<section class="card"><div class="title">与上一节的连接</div>
+<div class="flow">
+<div class="box"><b>TBN</b><span>World → Tangent</span></div><div class="arr">→</div>
+<div class="box hot"><b>viewDir</b><span>xy 对应表面 UV 方向<br>z 对应垂直表面方向</span></div><div class="arr">→</div>
+<div class="box hot"><b>Parallax</b><span>先改采样位置</span></div><div class="arr">→</div>
+<div class="box"><b>Normal Mapping</b><span>再从新位置读取法线</span></div>
+</div></section>
+</div></body></html>
