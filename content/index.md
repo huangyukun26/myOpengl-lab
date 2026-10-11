@@ -32,9 +32,10 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 [[learn/05-advanced-lighting/03-shadow-mapping|03 · Shadow Mapping 阴影映射]]  
 [[learn/05-advanced-lighting/04-point-shadows|04 · Point Shadows 点阴影]]  
 [[learn/05-advanced-lighting/05-normal-mapping|05 · Normal Mapping 法线贴图]]  
-[[learn/05-advanced-lighting/06-parallax-mapping|06 · Parallax Mapping 视差贴图]]
+[[learn/05-advanced-lighting/06-parallax-mapping|06 · Parallax Mapping 视差贴图]]  
+[[learn/05-advanced-lighting/07-hdr|07 · HDR 高动态范围]]
 
-当前章节：**Parallax Mapping**。Depth Map 和 Tangent Space 中的观察方向共同决定 UV 偏移；Steep Parallax 与 POM 通过分层搜索与插值提高交点估计精度。
+当前章节：**HDR**。第一遍把线性光照写入 RGBA16F 浮点颜色附件，保留大于 1.0 的亮度；第二遍通过 Tone Mapping、Exposure 与 Gamma Correction 映射到最终显示范围。
 
 ## Interactive Labs
 
@@ -53,4 +54,5 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 <form action="/myOpengl-lab/static/labs/point-shadows.html" method="get"><button type="submit">🎮 Point Shadows Lab · Cubemap / PCF</button></form>
 <form action="/myOpengl-lab/static/labs/normal-mapping.html" method="get"><button type="submit">🎮 Normal Mapping Lab · TBN / Per-Fragment Normal</button></form>
 <form action="/myOpengl-lab/static/labs/parallax-mapping.html" method="get"><button type="submit">🎮 Parallax Mapping Lab · Basic / Steep / POM</button></form>
+<form action="/myOpengl-lab/static/labs/hdr.html" method="get"><button type="submit">🎮 HDR Lab · LDR Clamp / Float Buffer / Exposure</button></form>
 
