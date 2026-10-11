@@ -1,36 +1,83 @@
 <!doctype html>
 <html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>HDR Lab</title>
+<title>HDR Tone Mapping Lab</title>
 <style>
 :root{color-scheme:light dark;--bg:#f5f7fa;--panel:#fff;--card:#f8fafc;--text:#172033;--muted:#667085;--border:#d9e1eb;--accent:#e09b32}
 @media(prefers-color-scheme:dark){:root{--bg:#0d1117;--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
-.wrap{max-width:1180px;margin:auto;padding:18px}.head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end}.head h1{font-size:22px;margin:0}.head p{font-size:13px;color:var(--muted);margin:5px 0 0}
-.tabs,.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tabs button,.controls button{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:9px;padding:8px 11px;cursor:pointer}.tabs button.active,.controls button.active{border-color:var(--accent)}
-.stage{margin-top:14px;border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:14px}.canvasWrap{position:relative}canvas{display:block;width:100%;aspect-ratio:16/8;border-radius:12px;background:#07090d}.labels{position:absolute;inset:0;pointer-events:none}.labels span{position:absolute;top:10px;padding:5px 9px;border-radius:8px;background:rgba(10,14,20,.76);color:#fff;font-size:12px;font-weight:700}.labels .left{left:12px}.labels .right{left:calc(50% + 12px)}
-.controls{margin-top:12px}.ctl{display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--card);border-radius:9px;padding:7px 9px;font-size:12px;color:var(--muted)}.ctl input{width:160px}.ctl span{min-width:42px;text-align:right;color:var(--text)}
-.info{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}.card{border:1px solid var(--border);background:var(--panel);border-radius:14px;padding:14px}.card h2{font-size:15px;margin:0 0 8px}.card p,.card pre{font-size:12px;line-height:1.7;color:var(--muted);margin:0}.card pre{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--card);border:1px solid var(--border);padding:10px;border-radius:10px;margin-top:8px}
-@media(max-width:760px){.head{align-items:flex-start;flex-direction:column}.info{grid-template-columns:1fr}.ctl input{width:110px}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1240px;margin:auto;padding:18px}
+.head{display:flex;justify-content:space-between;gap:16px;align-items:flex-end}
+.head h1{font-size:22px;margin:0}.head p{font-size:13px;color:var(--muted);margin:6px 0 0;max-width:760px}
+.tabs,.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.tabs button,.controls button{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:9px;padding:8px 11px;cursor:pointer}
+.tabs button.active,.controls button.active{border-color:var(--accent)}
+.stage{margin-top:14px;border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:14px}
+.canvasWrap{position:relative}
+canvas{display:block;width:100%;aspect-ratio:16/7;border-radius:12px;background:#05070b}
+.labels{position:absolute;inset:0;pointer-events:none}
+.labels span{position:absolute;top:10px;padding:6px 9px;border-radius:8px;background:rgba(8,12,18,.76);color:#fff;font-size:12px;font-weight:700}
+.labels .a{left:12px}.labels .b{left:calc(33.333% + 12px)}.labels .c{left:calc(66.666% + 12px)}
+.controls{margin-top:12px}
+.ctl{display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--card);border-radius:9px;padding:7px 9px;font-size:12px;color:var(--muted)}
+.ctl input{width:180px}.ctl span{min-width:42px;text-align:right;color:var(--text)}
+.info{display:grid;grid-template-columns:1.15fr .85fr;gap:12px;margin-top:14px}
+.card{border:1px solid var(--border);background:var(--panel);border-radius:14px;padding:14px}
+.card h2{font-size:15px;margin:0 0 8px}.card p,.card pre{font-size:12px;line-height:1.75;color:var(--muted);margin:0}
+.card pre{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;background:var(--card);border:1px solid var(--border);padding:10px;border-radius:10px;margin-top:8px}
+.legend{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.legend div{border:1px solid var(--border);border-radius:10px;padding:10px;background:var(--card);font-size:12px;line-height:1.55}.legend b{display:block;margin-bottom:3px}
+@media(max-width:780px){.head{align-items:flex-start;flex-direction:column}.info{grid-template-columns:1fr}.legend{grid-template-columns:1fr}.ctl input{width:130px}.labels span{font-size:10px}}
 </style></head><body><div class="wrap">
-<div class="head"><div><h1>HDR Lab</h1><p>左侧观察 LDR 过早截断，右侧观察 RGBA16F 保存高亮后再 Tone Mapping。</p></div>
-<div class="tabs"><button class="tab active" data-mode="compare">LDR vs HDR</button><button class="tab" data-mode="hdr">HDR Only</button><button class="tab" data-mode="raw">HDR Buffer</button></div></div>
-
-<section class="stage"><div class="canvasWrap">
-<canvas id="gl" width="1200" height="600"></canvas>
-<div id="compareLabels" class="labels"><span class="left">LDR · Clamp first</span><span class="right">HDR · Float + Tone Map</span></div>
+<div class="head">
+  <div><h1>HDR Tone Mapping Lab</h1><p>用同一份 HDR 浮点图像同时模拟“为窗外曝光”“为室内曝光”和“Tone Mapping”。重点看：不是换了场景，而是同一个 RGBA16F Buffer 用不同方式映射到屏幕。</p></div>
+  <div class="tabs">
+    <button class="tab active" data-mode="compare">三联对比</button>
+    <button class="tab" data-mode="tone">Tone Mapped</button>
+    <button class="tab" data-mode="raw">HDR 数据</button>
+  </div>
 </div>
-<div class="controls">
-<label class="ctl">Exposure <input id="exposure" type="range" min="0.1" max="3.0" step="0.05" value="1.0"><span id="exposureVal">1.00</span></label>
-<label class="ctl">Light Intensity <input id="intensity" type="range" min="1" max="40" step="0.5" value="18"><span id="intensityVal">18.0</span></label>
-<button id="toggleTone">Exposure Tone Map</button>
-</div></section>
+
+<section class="stage">
+  <div class="canvasWrap">
+    <canvas id="gl" width="1440" height="630"></canvas>
+    <div id="compareLabels" class="labels">
+      <span class="a">低曝光 · 窗外有细节</span>
+      <span class="b">高曝光 · 室内有细节</span>
+      <span class="c">HDR Tone Mapping · 两边兼顾</span>
+    </div>
+  </div>
+  <div class="controls">
+    <label class="ctl">Tone Exposure <input id="exposure" type="range" min="0.15" max="2.5" step="0.05" value="0.9"><span id="exposureVal">0.90</span></label>
+    <label class="ctl">Sun / Window Intensity <input id="intensity" type="range" min="8" max="80" step="1" value="42"><span id="intensityVal">42</span></label>
+    <button id="toggleTone">Reinhard Tone Map</button>
+  </div>
+</section>
 
 <div class="info">
-<section class="card"><h2 id="modeTitle">LDR Clamp vs HDR</h2><p id="modeText">两边先计算同一组线性亮度。左边写进 RGBA8 时，大于 1.0 的部分已经丢失；右边写进 RGBA16F，之后再 Tone Mapping。</p><pre>Lighting
-→ RGBA16F
-→ Tone Mapping
+  <section class="card">
+    <h2>这张图在说明什么</h2>
+    <p>三个画面都来自同一个 <b>RGBA16F HDR Color Buffer</b>。左边把曝光压低，所以窗外天空和太阳保住了，但室内接近黑；中间把曝光抬高，所以室内家具能看见，但窗外很快过曝；右边先保留 HDR 数据，再通过 Tone Mapping 压缩动态范围，因此亮窗和暗室能同时留下层次。</p>
+    <div class="legend">
+      <div><b>低曝光</b>亮部好看，暗部损失。</div>
+      <div><b>高曝光</b>暗部好看，亮部损失。</div>
+      <div><b>Tone Mapping</b>利用完整 HDR 数据重新分配显示范围。</div>
+    </div>
+  </section>
+  <section class="card">
+    <h2>对应 OpenGL 数据流</h2>
+    <pre>Pass 1
+Scene Lighting
+→ RGBA16F FBO
+→ 0.04 / 0.8 / 12 / 40 ...
+
+Pass 2
+同一张 HDR Texture
+→ Exposure / Tone Mapping
 → Gamma
-→ Screen</pre></section>
-<section class="card"><h2>观察点</h2><p>把 Light Intensity 调高：LDR 高亮区域会迅速糊成同一种白；HDR 仍能利用 2、5、20 等不同亮度值。再调 Exposure，会看到同一份 HDR 数据可以得到不同显示结果。</p></section>
-</div></div><script src="hdr.js"></script></body></html>
+→ Default Framebuffer</pre>
+    <p style="margin-top:8px">所以 FBO 的价值不是“多画一次”，而是先把亮度差异完整留下，第二遍才决定怎样显示。</p>
+  </section>
+</div>
+</div><script src="hdr.js"></script></body></html>
