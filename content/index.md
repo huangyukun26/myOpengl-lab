@@ -33,9 +33,10 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 [[learn/05-advanced-lighting/04-point-shadows|04 · Point Shadows 点阴影]]  
 [[learn/05-advanced-lighting/05-normal-mapping|05 · Normal Mapping 法线贴图]]  
 [[learn/05-advanced-lighting/06-parallax-mapping|06 · Parallax Mapping 视差贴图]]  
-[[learn/05-advanced-lighting/07-hdr|07 · HDR 高动态范围]]
+[[learn/05-advanced-lighting/07-hdr|07 · HDR 高动态范围]]  
+[[learn/05-advanced-lighting/08-bloom|08 · Bloom 泛光]]
 
-当前章节：**HDR**。第一遍把线性光照写入 RGBA16F 浮点颜色附件，保留大于 1.0 的亮度；第二遍通过 Tone Mapping、Exposure 与 Gamma Correction 映射到最终显示范围。
+当前章节：**Bloom**。从 HDR 场景中提取高亮像素，通过 Ping-Pong Gaussian Blur 扩散亮度，再与原始 HDR Scene 相加，最后执行 Tone Mapping 与 Gamma Correction。
 
 ## Interactive Labs
 
@@ -55,4 +56,5 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 <form action="/myOpengl-lab/static/labs/normal-mapping.html" method="get"><button type="submit">🎮 Normal Mapping Lab · TBN / Per-Fragment Normal</button></form>
 <form action="/myOpengl-lab/static/labs/parallax-mapping.html" method="get"><button type="submit">🎮 Parallax Mapping Lab · Basic / Steep / POM</button></form>
 <form action="/myOpengl-lab/static/labs/hdr.html" method="get"><button type="submit">🎮 HDR Lab · LDR Clamp / Float Buffer / Exposure</button></form>
+<form action="/myOpengl-lab/static/labs/bloom.html" method="get"><button type="submit">🎮 Bloom Lab · Threshold / Blur / Composite</button></form>
 
