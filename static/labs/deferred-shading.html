@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-CN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deferred Shading Lab</title>
+<style>
+:root{color-scheme:light dark;--bg:#f5f7fa;--panel:#fff;--card:#f8fafc;--text:#172033;--muted:#697386;--border:#d9e1eb;--accent:#4f8bd8}
+@media(prefers-color-scheme:dark){:root{--bg:#0b0f14;--panel:#151b23;--card:#10161e;--text:#e6edf3;--muted:#98a4b5;--border:#303a49}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,-apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+.wrap{max-width:1220px;margin:auto;padding:18px}.head{display:flex;justify-content:space-between;align-items:flex-end;gap:16px}.head h1{font-size:22px;margin:0}.head p{font-size:13px;color:var(--muted);margin:6px 0 0;max-width:780px}
+.tabs,.controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.tabs button,.controls button{border:1px solid var(--border);background:var(--panel);color:var(--text);border-radius:9px;padding:8px 11px;cursor:pointer}.tabs button.active{border-color:var(--accent)}
+.stage{margin-top:14px;border:1px solid var(--border);background:var(--panel);border-radius:16px;padding:14px}canvas{display:block;width:100%;aspect-ratio:16/8;border-radius:12px;background:#060910}
+.controls{margin-top:12px}.ctl{display:flex;align-items:center;gap:8px;border:1px solid var(--border);background:var(--card);border-radius:9px;padding:7px 9px;font-size:12px;color:var(--muted)}.ctl input{width:160px}.ctl span{min-width:38px;text-align:right;color:var(--text)}
+.info{display:grid;grid-template-columns:1.08fr .92fr;gap:12px;margin-top:14px}.card{border:1px solid var(--border);background:var(--panel);border-radius:14px;padding:14px}.card h2{font-size:15px;margin:0 0 8px}.card p,.card pre{font-size:12px;line-height:1.72;color:var(--muted);margin:0}.card pre{margin-top:8px;white-space:pre-wrap;background:var(--card);border:1px solid var(--border);padding:10px;border-radius:10px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
+@media(max-width:760px){.head{align-items:flex-start;flex-direction:column}.info{grid-template-columns:1fr}.ctl input{width:110px}}
+</style></head><body><div class="wrap">
+<div class="head">
+<div><h1>Deferred Shading Lab</h1><p>第一遍真实写入 Position / Normal / Albedo+Spec G-Buffer；第二遍只画 Fullscreen Quad，再从 G-Buffer 读取表面信息计算多光源。</p></div>
+<div class="tabs">
+<button class="tab active" data-mode="final">Final</button>
+<button class="tab" data-mode="position">Position</button>
+<button class="tab" data-mode="normal">Normal</button>
+<button class="tab" data-mode="albedo">Albedo + Spec</button>
+</div></div>
+
+<section class="stage">
+<canvas id="gl" width="1200" height="600"></canvas>
+<div class="controls">
+<label class="ctl">Lights <input id="lights" type="range" min="1" max="64" step="1" value="32"><span id="lightsVal">32</span></label>
+<label class="ctl">Ambient <input id="ambient" type="range" min="0" max="0.35" step="0.01" value="0.08"><span id="ambientVal">0.08</span></label>
+</div>
+</section>
+
+<div class="info">
+<section class="card"><h2>这次真正被“延迟”的是什么</h2><pre>Geometry Pass
+→ Position
+→ Normal
+→ Albedo / Specular
+→ 先存进 G-Buffer
+
+Lighting Pass
+→ Fullscreen Quad
+→ 每个屏幕像素查 G-Buffer
+→ 再遍历 Lights
+→ Final Color</pre></section>
+<section class="card"><h2>观察方法</h2><p>先依次切 Position、Normal、Albedo，看第一遍并没有输出最终光照，而是在记录“这个像素对应的表面是什么”。再切 Final 并增加 Lights：几何没有重新画一遍，变化发生在第二遍 Lighting Pass。</p></section>
+</div>
+</div><script src="deferred-shading.js"></script></body></html>
