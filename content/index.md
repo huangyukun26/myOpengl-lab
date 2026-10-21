@@ -34,9 +34,10 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 [[learn/05-advanced-lighting/05-normal-mapping|05 · Normal Mapping 法线贴图]]  
 [[learn/05-advanced-lighting/06-parallax-mapping|06 · Parallax Mapping 视差贴图]]  
 [[learn/05-advanced-lighting/07-hdr|07 · HDR 高动态范围]]  
-[[learn/05-advanced-lighting/08-bloom|08 · Bloom 泛光]]
+[[learn/05-advanced-lighting/08-bloom|08 · Bloom 泛光]]  
+[[learn/05-advanced-lighting/09-deferred-shading|09 · Deferred Shading 延迟着色法]]
 
-当前章节：**Bloom**。从 HDR 场景中提取高亮像素，通过 Ping-Pong Gaussian Blur 扩散亮度，再与原始 HDR Scene 相加，最后执行 Tone Mapping 与 Gamma Correction。
+当前章节：**Deferred Shading**。Geometry Pass 先把 Position / Normal / Albedo+Specular 写入 G-Buffer，Lighting Pass 再用 Fullscreen Quad 统一读取这些表面数据并计算大量光源。
 
 ## Interactive Labs
 
@@ -57,4 +58,5 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 <form action="/myOpengl-lab/static/labs/parallax-mapping.html" method="get"><button type="submit">🎮 Parallax Mapping Lab · Basic / Steep / POM</button></form>
 <form action="/myOpengl-lab/static/labs/hdr.html" method="get"><button type="submit">🎮 HDR Lab · LDR Clamp / Float Buffer / Exposure</button></form>
 <form action="/myOpengl-lab/static/labs/bloom.html" method="get"><button type="submit">🎮 Bloom Lab · Threshold / Blur / Composite</button></form>
+<form action="/myOpengl-lab/static/labs/deferred-shading.html" method="get"><button type="submit">🎮 Deferred Shading Lab · G-Buffer / Lights / Final</button></form>
 
