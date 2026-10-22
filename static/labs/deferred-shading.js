@@ -73,7 +73,7 @@ function makeGMat(o={}){
 const lightingMat=new THREE.ShaderMaterial({
   glslVersion:THREE.GLSL3,
   uniforms:{gPosition:{value:gBuffer.textures[0]},gNormal:{value:gBuffer.textures[1]},gAlbedoSpec:{value:gBuffer.textures[2]},...common},
-  vertexShader:['in vec3 position;out vec2 vUv;','void main(){vUv=position.xy*.5+.5;gl_Position=vec4(position.xy,0.0,1.0);}'].join('\n'),
+  vertexShader:['out vec2 vUv;','void main(){vUv=position.xy*.5+.5;gl_Position=vec4(position.xy,0.0,1.0);}'].join('\n'),
   fragmentShader:[
 'precision highp float;','#define MAX_LIGHTS 128','in vec2 vUv;out vec4 outColor;',
 'uniform sampler2D gPosition,gNormal,gAlbedoSpec;uniform int uLightCount;uniform vec3 uLightPos[MAX_LIGHTS];uniform vec3 uLightColor[MAX_LIGHTS];uniform float uRadius;uniform vec3 uViewPos;uniform float uExposure;',
@@ -87,7 +87,7 @@ const lightingScene=new THREE.Scene();lightingScene.add(new THREE.Mesh(new THREE
 const composeMat=new THREE.ShaderMaterial({
   glslVersion:THREE.GLSL3,
   uniforms:{uForward:{value:forwardRT.texture},uDeferred:{value:deferredRT.texture},gPosition:{value:gBuffer.textures[0]},gNormal:{value:gBuffer.textures[1]},gAlbedoSpec:{value:gBuffer.textures[2]},uMode:{value:0}},
-  vertexShader:['in vec3 position;out vec2 vUv;','void main(){vUv=position.xy*.5+.5;gl_Position=vec4(position.xy,0.0,1.0);}'].join('\n'),
+  vertexShader:['out vec2 vUv;','void main(){vUv=position.xy*.5+.5;gl_Position=vec4(position.xy,0.0,1.0);}'].join('\n'),
   fragmentShader:[
 'precision highp float;in vec2 vUv;out vec4 outColor;uniform sampler2D uForward,uDeferred,gPosition,gNormal,gAlbedoSpec;uniform int uMode;',
 'vec3 pv(vec2 q){return clamp(texture(gPosition,q).xyz*.055+.5,0.0,1.0);}vec3 nv(vec2 q){return texture(gNormal,q).xyz*.5+.5;}',
