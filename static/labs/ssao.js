@@ -220,15 +220,22 @@ function perspective(fov,asp,n,f){const q=1/Math.tan(fov/2),o=new Float32Array(1
 function lookAt(e,c,u){let zx=e[0]-c[0],zy=e[1]-c[1],zz=e[2]-c[2],l=Math.hypot(zx,zy,zz);zx/=l;zy/=l;zz/=l;let xx=u[1]*zz-u[2]*zy,xy=u[2]*zx-u[0]*zz,xz=u[0]*zy-u[1]*zx;l=Math.hypot(xx,xy,xz);xx/=l;xy/=l;xz/=l;let yx=zy*xz-zz*xy,yy=zz*xx-zx*xz,yz=zx*xy-zy*xx;const o=I();o[0]=xx;o[1]=yx;o[2]=zx;o[4]=xy;o[5]=yy;o[6]=zy;o[8]=xz;o[9]=yz;o[10]=zz;o[12]=-(xx*e[0]+xy*e[1]+xz*e[2]);o[13]=-(yx*e[0]+yy*e[1]+yz*e[2]);o[14]=-(zx*e[0]+zy*e[1]+zz*e[2]);return o;}
 function transformPoint(m,p){return[m[0]*p[0]+m[4]*p[1]+m[8]*p[2]+m[12],m[1]*p[0]+m[5]*p[1]+m[9]*p[2]+m[13],m[2]*p[0]+m[6]*p[1]+m[10]*p[2]+m[14]];}
 
-const proj=perspective(Math.PI/4,canvas.width/canvas.height,.1,50);
-const view=lookAt([0,0,5],[0,0,0],[0,1,0]);
+let fov=Math.PI/4;
+let cameraPos=[4.8,2.2,8.8];
+let yaw=-2.08,pitch=-0.18;
+let proj=perspective(fov,canvas.width/canvas.height,.1,50);
+let view=I();
+function cameraForward(){const cp=Math.cos(pitch);return [Math.cos(yaw)*cp,Math.sin(pitch),Math.sin(yaw)*cp];}
+function updateView(){const f=cameraForward();view=lookAt(cameraPos,[cameraPos[0]+f[0],cameraPos[1]+f[1],cameraPos[2]+f[2]],[0,1,0]);}
+function resetCamera(){cameraPos=[4.8,2.2,8.8];yaw=-2.08;pitch=-0.18;fov=Math.PI/4;proj=perspective(fov,canvas.width/canvas.height,.1,50);updateView();}
+updateView();
 const floorModel=mul(T(0,-1,0),S(20,1,20));
 const nanosuitModel=mul(mul(T(0,0,5),RX(-Math.PI/2)),S(.5,.5,.5));
 const lightWorld=[2,4,-2];
-const lightView=transformPoint(view,lightWorld);
 
 let nanosuit=null;
 let mode=0,kernelSize=64,radius=.5,bias=.025,power=1,useNoise=true,useRange=true,blurOn=true;
+const keys=new Set();let dragging=false,lastMouseX=0,lastMouseY=0,lastTime=performance.now();
 
 function bindTex(unit,t,p,name){gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,t);gl.uniform1i(U(p,name),unit);}
 function quad(){gl.bindVertexArray(quadVAO);gl.drawArrays(gl.TRIANGLES,0,6);}
@@ -279,12 +286,13 @@ function renderFinal(){
  bindTex(0,gPos,finalP,'gPosition');bindTex(1,gNorm,finalP,'gNormal');bindTex(2,gAlb,finalP,'gAlbedo');bindTex(3,aoTex,finalP,'ssaoRaw');bindTex(4,aoBlurTex,finalP,'ssaoBlur');
  gl.uniform1i(U(finalP,'mode'),mode);
  gl.uniform1i(U(finalP,'blurOn'),blurOn?1:0);
- gl.uniform3fv(U(finalP,'lightPos'),new Float32Array(lightView));
+ const lightView=transformPoint(view,lightWorld);gl.uniform3fv(U(finalP,'lightPos'),new Float32Array(lightView));
  gl.uniform3f(U(finalP,'lightColor'),.2,.2,.7);
  quad();
 }
 
-function frame(){renderGeometry();renderSSAO();renderBlur();renderFinal();requestAnimationFrame(frame);}
+function updateCameraMotion(dt){const speed=3.2*dt;const f=cameraForward();let fx=f[0],fz=f[2];let fl=Math.hypot(fx,fz)||1;fx/=fl;fz/=fl;const rx=-fz,rz=fx;if(keys.has('KeyW')){cameraPos[0]+=fx*speed;cameraPos[2]+=fz*speed;}if(keys.has('KeyS')){cameraPos[0]-=fx*speed;cameraPos[2]-=fz*speed;}if(keys.has('KeyA')){cameraPos[0]-=rx*speed;cameraPos[2]-=rz*speed;}if(keys.has('KeyD')){cameraPos[0]+=rx*speed;cameraPos[2]+=rz*speed;}if(keys.has('KeyQ'))cameraPos[1]-=speed;if(keys.has('KeyE'))cameraPos[1]+=speed;updateView();}
+function frame(now){const dt=Math.min(.05,(now-lastTime)/1000);lastTime=now;updateCameraMotion(dt);renderGeometry();renderSSAO();renderBlur();renderFinal();requestAnimationFrame(frame);}
 
 async function loadOfficialNanosuit(){
  try{
@@ -322,6 +330,13 @@ document.getElementById('reset').addEventListener('click',()=>{
  for(const [id,on,label] of [['range',useRange,'Range Check'],['noise',useNoise,'Noise Rotation'],['blurToggle',blurOn,'Blur']]){const el=document.getElementById(id);el.classList.toggle('active',on);el.textContent=label+' '+(on?'ON':'OFF');}
 });
 
+window.addEventListener('keydown',e=>{if(['KeyW','KeyA','KeyS','KeyD','KeyQ','KeyE'].includes(e.code)){keys.add(e.code);e.preventDefault();}if(e.code==='KeyR'){resetCamera();}});
+window.addEventListener('keyup',e=>keys.delete(e.code));
+canvas.addEventListener('pointerdown',e=>{dragging=true;lastMouseX=e.clientX;lastMouseY=e.clientY;canvas.setPointerCapture(e.pointerId);});
+canvas.addEventListener('pointermove',e=>{if(!dragging)return;const dx=e.clientX-lastMouseX,dy=e.clientY-lastMouseY;lastMouseX=e.clientX;lastMouseY=e.clientY;yaw+=dx*.005;pitch=Math.max(-1.35,Math.min(1.35,pitch-dy*.004));updateView();});
+canvas.addEventListener('pointerup',()=>dragging=false);canvas.addEventListener('pointercancel',()=>dragging=false);
+canvas.addEventListener('wheel',e=>{e.preventDefault();fov=Math.max(Math.PI/8,Math.min(Math.PI/2,fov+e.deltaY*.0008));proj=perspective(fov,canvas.width/canvas.height,.1,50);},{passive:false});
+document.getElementById('resetCamera').addEventListener('click',resetCamera);
 loadOfficialNanosuit();
 requestAnimationFrame(frame);
 })();
