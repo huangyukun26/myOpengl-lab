@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="620" viewBox="0 0 1100 620">
+<defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#0b1220"/><stop offset="1" stop-color="#111827"/></linearGradient><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#8fb8ff"/></marker></defs>
+<rect width="1100" height="620" rx="28" fill="url(#bg)"/>
+<text x="50" y="58" fill="#eef4ff" font-size="28" font-family="system-ui" font-weight="700">SSAO：当前像素周围到底在采样什么？</text>
+<line x1="85" y1="470" x2="1010" y2="470" stroke="#738199" stroke-width="6"/>
+<path d="M520 470 A210 210 0 0 1 940 470" fill="none" stroke="#4c77be" stroke-width="3" stroke-dasharray="10 10"/>
+<circle cx="730" cy="470" r="10" fill="#ffffff"/>
+<line x1="730" y1="470" x2="730" y2="270" stroke="#78d6a6" stroke-width="5" marker-end="url(#arr)"/>
+<text x="747" y="300" fill="#92e0b4" font-size="20" font-family="system-ui">Normal N</text>
+<g fill="#8fb8ff">
+<circle cx="640" cy="402" r="8"/><circle cx="682" cy="350" r="8"/><circle cx="742" cy="320" r="8"/><circle cx="805" cy="350" r="8"/><circle cx="858" cy="402" r="8"/><circle cx="605" cy="442" r="8"/><circle cx="775" cy="420" r="8"/>
+</g>
+<rect x="575" y="370" width="70" height="100" rx="10" fill="#b05454" opacity=".8"/>
+<text x="95" y="155" fill="#d9e5f7" font-size="22" font-family="system-ui">1. 从 G-Buffer 取当前 Fragment 的 Position + Normal</text>
+<text x="95" y="205" fill="#d9e5f7" font-size="22" font-family="system-ui">2. 沿 Normal 朝外建立半球 Sample Kernel</text>
+<text x="95" y="255" fill="#d9e5f7" font-size="22" font-family="system-ui">3. Sample 落进周围几何越多 → AO 越暗</text>
+<text x="95" y="305" fill="#8fa1b8" font-size="18" font-family="system-ui">红色几何挡住了部分采样方向，因此该像素的 Ambient 会被压低。</text>
+<text x="585" y="530" fill="#d7e2ef" font-size="18" font-family="system-ui">当前 Fragment</text>
+<text x="564" y="575" fill="#9aabc1" font-size="16" font-family="system-ui">半球只朝表面外侧，避免把“自己下面的表面”也算成遮挡。</text>
+</svg>
