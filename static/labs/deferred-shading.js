@@ -52,12 +52,12 @@ const forwardFS=[
 ].join('\\n');
 
 const gVS=[
-'varying vec3 vWorldPos;varying vec3 vWorldNormal;varying vec2 vUv;',
+'out vec3 vWorldPos;out vec3 vWorldNormal;out vec2 vUv;',
 'void main(){vec4 w=modelMatrix*vec4(position,1.0);vWorldPos=w.xyz;vWorldNormal=normalize(mat3(modelMatrix)*normal);vUv=uv;gl_Position=projectionMatrix*viewMatrix*w;}'
 ].join('\\n');
 
 const gFS=[
-'precision highp float;','varying vec3 vWorldPos;varying vec3 vWorldNormal;varying vec2 vUv;',
+'precision highp float;','in vec3 vWorldPos;in vec3 vWorldNormal;in vec2 vUv;',
 'uniform sampler2D uMap;uniform bool uUseMap;uniform vec3 uBaseColor;uniform float uSpecular;uniform float uFloor;',
 'layout(location=0) out vec4 gPosition;layout(location=1) out vec4 gNormal;layout(location=2) out vec4 gAlbedoSpec;',
 'void main(){vec3 c=uUseMap?texture(uMap,vUv).rgb:uBaseColor;if(uFloor>.5){float gx=step(.965,fract(abs(vWorldPos.x)*.5));float gz=step(.965,fract(abs(vWorldPos.z)*.5));c*=1.0+.22*max(gx,gz);}gPosition=vec4(vWorldPos,1.0);gNormal=vec4(normalize(vWorldNormal),1.0);gAlbedoSpec=vec4(c,uSpecular);}'
