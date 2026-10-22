@@ -13,9 +13,9 @@
 .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:12px;margin-top:14px}.card{border:1px solid var(--border);background:linear-gradient(180deg,#101720,#0c1219);border-radius:14px;padding:14px}.card h2{font-size:15px;margin:0 0 8px}.card p,.card pre{font-size:12px;line-height:1.72;color:var(--muted);margin:0}.card pre{margin-top:8px;white-space:pre-wrap;background:#080d14;border:1px solid #202b3b;padding:10px;border-radius:10px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace}
 @media(max-width:760px){.head{align-items:flex-start;flex-direction:column}.grid{grid-template-columns:1fr}.ctl input{width:105px}}
 </style></head><body><div class="wrap">
-<div class="head"><div><span class="pill">LearnOpenGL Official Scene + Debug Views</span><h1>SSAO Lab · Official+</h1><p>场景严格沿用 LearnOpenGL SSAO 示例：房间 Cube + 官方 Backpack；默认参数也是官方的 64 Samples / Radius 0.5 / Bias 0.025。Plus 只增加中间 Buffer 与开关，不改教学场景。</p></div>
+<div class="head"><div><span class="pill">LearnOpenGL Official Scene + Debug Views</span><h1>SSAO Lab · Official+</h1><p>场景严格沿用 LearnOpenGL SSAO 示例：Floor Cube + 官方 Nanosuit；默认参数也是官方的 64 Samples / Radius 0.5 / Bias 0.025。Plus 只增加中间 Buffer 与开关，不改教学场景。</p></div>
 <div class="tabs"><button class="tab active" data-mode="final">Final + SSAO</button><button class="tab" data-mode="noao">No SSAO</button><button class="tab" data-mode="raw">Raw AO</button><button class="tab" data-mode="blur">Blurred AO</button><button class="tab" data-mode="position">Position</button><button class="tab" data-mode="normal">Normal</button></div></div>
-<section class="stage"><div class="canvasWrap"><canvas id="gl" width="800" height="600"></canvas><div id="badge" class="badge">Official: G-Buffer → SSAO → Blur → Lighting</div><div id="status" class="status">Loading official backpack…</div></div>
+<section class="stage"><div class="canvasWrap"><canvas id="gl" width="800" height="600"></canvas><div id="badge" class="badge">Official: G-Buffer → SSAO → Blur → Lighting</div><div id="status" class="status">Loading official nanosuit…</div></div>
 <div class="controls">
 <label class="ctl">Kernel <input id="kernel" type="range" min="8" max="64" step="8" value="64"><span id="kernelVal">64</span></label>
 <label class="ctl">Radius <input id="radius" type="range" min="0.10" max="1.50" step="0.05" value="0.50"><span id="radiusVal">0.50</span></label>
@@ -27,13 +27,13 @@
 <button id="reset">Reset Official Defaults</button>
 </div></section>
 <div class="grid">
-<section class="card"><h2>Official 场景</h2><p>和 LearnOpenGL 源码一致：先渲染一个放大的房间 Cube，并把法线翻到室内；再把 Backpack 放在房间地面附近。Geometry Pass 保存 View-Space Position / Normal / Albedo。</p><pre>room:
-translate(0, 7, 0)
-scale(7.5)
-invert normals
+<section class="card"><h2>Official 场景</h2><p>按 LearnOpenGL 经典 SSAO demo：先渲染放大的 Floor Cube，再渲染 Nanosuit 人物模型。Geometry Pass 保存 View-Space Position / Normal / Albedo。</p><pre>floor:
+translate(0, -1, 0)
+scale(20, 1, 20)
 
-backpack:
-translate(0, 0.5, 0)
-rotateX(-90°)</pre></section>
+nanosuit:
+translate(0, 0, 5)
+rotateX(-90°)
+scale(0.5)</pre></section>
 <section class="card"><h2>Plus 只增强观察</h2><p>切 Raw AO 看采样结果；关 Range Check 看远处表面如何错误贡献 AO；关 Noise 看固定 Kernel 的 Banding；再开 Blur 看噪声如何被平滑。Final / No SSAO 用来观察 SSAO 只影响 Ambient。</p></section>
 </div></div><script src="ssao.js"></script></body></html>
