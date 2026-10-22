@@ -38,7 +38,7 @@ const common={
 const forwardVS=[
 'varying vec3 vWorldPos;varying vec3 vWorldNormal;varying vec2 vUv;',
 'void main(){vec4 w=modelMatrix*vec4(position,1.0);vWorldPos=w.xyz;vWorldNormal=normalize(mat3(modelMatrix)*normal);vUv=uv;gl_Position=projectionMatrix*viewMatrix*w;}'
-].join('\\n');
+].join('\n');
 
 const forwardFS=[
 'precision highp float;','#define MAX_LIGHTS 128',
@@ -49,19 +49,19 @@ const forwardFS=[
 'void main(){vec3 albedo=baseColor();vec3 N=normalize(vWorldNormal);vec3 V=normalize(uViewPos-vWorldPos);vec3 outc=albedo*.035;',
 'for(int i=0;i<MAX_LIGHTS;i++){if(i>=uLightCount)break;vec3 d=uLightPos[i]-vWorldPos;float dist=length(d);if(dist<uRadius){vec3 L=d/max(dist,.001);float att=1.0/(1.0+.16*dist+.20*dist*dist);float ndl=max(dot(N,L),0.0);vec3 H=normalize(L+V);float sp=pow(max(dot(N,H),0.0),28.0)*uSpecular;outc+=(albedo*ndl+vec3(sp))*uLightColor[i]*att*2.25;}}',
 'outc=vec3(1.0)-exp(-outc*uExposure);outc=pow(max(outc,vec3(0.0)),vec3(1.0/2.2));gl_FragColor=vec4(outc,1.0);}'
-].join('\\n');
+].join('\n');
 
 const gVS=[
 'out vec3 vWorldPos;out vec3 vWorldNormal;out vec2 vUv;',
 'void main(){vec4 w=modelMatrix*vec4(position,1.0);vWorldPos=w.xyz;vWorldNormal=normalize(mat3(modelMatrix)*normal);vUv=uv;gl_Position=projectionMatrix*viewMatrix*w;}'
-].join('\\n');
+].join('\n');
 
 const gFS=[
 'precision highp float;','in vec3 vWorldPos;in vec3 vWorldNormal;in vec2 vUv;',
 'uniform sampler2D uMap;uniform bool uUseMap;uniform vec3 uBaseColor;uniform float uSpecular;uniform float uFloor;',
 'layout(location=0) out vec4 gPosition;layout(location=1) out vec4 gNormal;layout(location=2) out vec4 gAlbedoSpec;',
 'void main(){vec3 c=uUseMap?texture(uMap,vUv).rgb:uBaseColor;if(uFloor>.5){float gx=step(.965,fract(abs(vWorldPos.x)*.5));float gz=step(.965,fract(abs(vWorldPos.z)*.5));c*=1.0+.22*max(gx,gz);}gPosition=vec4(vWorldPos,1.0);gNormal=vec4(normalize(vWorldNormal),1.0);gAlbedoSpec=vec4(c,uSpecular);}'
-].join('\\n');
+].join('\n');
 
 function makeForwardMat(o={}){
   return new THREE.ShaderMaterial({vertexShader:forwardVS,fragmentShader:forwardFS,uniforms:{...common,uMap:{value:o.map||null},uUseMap:{value:!!o.map},uBaseColor:{value:new THREE.Color(o.color??0xffffff)},uSpecular:{value:o.spec??.35},uFloor:{value:o.floor??0}}});
@@ -73,21 +73,21 @@ function makeGMat(o={}){
 const lightingMat=new THREE.ShaderMaterial({
   glslVersion:THREE.GLSL3,
   uniforms:{gPosition:{value:gBuffer.textures[0]},gNormal:{value:gBuffer.textures[1]},gAlbedoSpec:{value:gBuffer.textures[2]},...common},
-  vertexShader:['in vec3 position;out vec2 vUv;','void main(){vUv=position.xy*.5+.5;gl_Position=vec4(position.xy,0.0,1.0);}'].join('\\n'),
+  vertexShader:['in vec3 position;out vec2 vUv;','void main(){vUv=position.xy*.5+.5;gl_Position=vec4(position.xy,0.0,1.0);}'].join('\n'),
   fragmentShader:[
 'precision highp float;','#define MAX_LIGHTS 128','in vec2 vUv;out vec4 outColor;',
 'uniform sampler2D gPosition,gNormal,gAlbedoSpec;uniform int uLightCount;uniform vec3 uLightPos[MAX_LIGHTS];uniform vec3 uLightColor[MAX_LIGHTS];uniform float uRadius;uniform vec3 uViewPos;uniform float uExposure;',
 'void main(){vec4 A=texture(gAlbedoSpec,vUv);if(A.a==0.0&&dot(A.rgb,A.rgb)<.00001){outColor=vec4(.005,.008,.014,1.0);return;}vec3 P=texture(gPosition,vUv).xyz;vec3 N=normalize(texture(gNormal,vUv).xyz);vec3 V=normalize(uViewPos-P);vec3 c=A.rgb*.035;',
 'for(int i=0;i<MAX_LIGHTS;i++){if(i>=uLightCount)break;vec3 d=uLightPos[i]-P;float dist=length(d);if(dist<uRadius){vec3 L=d/max(dist,.001);float att=1.0/(1.0+.16*dist+.20*dist*dist);float ndl=max(dot(N,L),0.0);vec3 H=normalize(L+V);float sp=pow(max(dot(N,H),0.0),28.0)*A.a;c+=(A.rgb*ndl+vec3(sp))*uLightColor[i]*att*2.25;}}',
 'c=vec3(1.0)-exp(-c*uExposure);c=pow(max(c,vec3(0.0)),vec3(1.0/2.2));outColor=vec4(c,1.0);}'
-].join('\\n')
+].join('\n')
 });
 const lightingScene=new THREE.Scene();lightingScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),lightingMat));
 
 const composeMat=new THREE.ShaderMaterial({
   glslVersion:THREE.GLSL3,
   uniforms:{uForward:{value:forwardRT.texture},uDeferred:{value:deferredRT.texture},gPosition:{value:gBuffer.textures[0]},gNormal:{value:gBuffer.textures[1]},gAlbedoSpec:{value:gBuffer.textures[2]},uMode:{value:0}},
-  vertexShader:['in vec3 position;out vec2 vUv;','void main(){vUv=position.xy*.5+.5;gl_Position=vec4(position.xy,0.0,1.0);}'].join('\\n'),
+  vertexShader:['in vec3 position;out vec2 vUv;','void main(){vUv=position.xy*.5+.5;gl_Position=vec4(position.xy,0.0,1.0);}'].join('\n'),
   fragmentShader:[
 'precision highp float;in vec2 vUv;out vec4 outColor;uniform sampler2D uForward,uDeferred,gPosition,gNormal,gAlbedoSpec;uniform int uMode;',
 'vec3 pv(vec2 q){return clamp(texture(gPosition,q).xyz*.055+.5,0.0,1.0);}vec3 nv(vec2 q){return texture(gNormal,q).xyz*.5+.5;}',
@@ -95,7 +95,7 @@ const composeMat=new THREE.ShaderMaterial({
 'if(uMode==1){outColor=texture(uForward,vUv);return;}if(uMode==2){outColor=texture(uDeferred,vUv);return;}',
 'vec2 q=fract(vUv*2.0);bool top=vUv.y>.5;bool left=vUv.x<.5;vec3 c;if(top&&left)c=pv(q);else if(top)c=nv(q);else if(left)c=texture(gAlbedoSpec,q).rgb;else c=vec3(texture(gAlbedoSpec,q).a);',
 'float line=max(1.0-smoothstep(0.0,.008,abs(vUv.x-.5)),1.0-smoothstep(0.0,.008,abs(vUv.y-.5)));c=mix(c,vec3(.03),line*.8);outColor=vec4(c,1.0);}'
-].join('\\n')
+].join('\n')
 });
 const composeScene=new THREE.Scene();composeScene.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2),composeMat));
 
