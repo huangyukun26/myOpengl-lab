@@ -15,7 +15,7 @@
 </style></head><body><div class="wrap">
 <div class="head"><div><span class="pill">LearnOpenGL Official Scene + Debug Views</span><h1>SSAO Lab · Official+</h1><p>场景严格沿用 LearnOpenGL SSAO 示例：Floor Cube + 官方 Nanosuit；默认参数也是官方的 64 Samples / Radius 0.5 / Bias 0.025。Plus 只增加中间 Buffer 与开关，不改教学场景。</p></div>
 <div class="tabs"><button class="tab active" data-mode="final">Final + SSAO</button><button class="tab" data-mode="noao">No SSAO</button><button class="tab" data-mode="raw">Raw AO</button><button class="tab" data-mode="blur">Blurred AO</button><button class="tab" data-mode="position">Position</button><button class="tab" data-mode="normal">Normal</button></div></div>
-<section class="stage"><div class="canvasWrap"><canvas id="gl" width="800" height="600"></canvas><div id="badge" class="badge">Official: G-Buffer → SSAO → Blur → Lighting</div><div id="status" class="status">Loading official nanosuit…</div></div>
+<section class="stage"><div class="canvasWrap"><canvas id="gl" width="800" height="600"></canvas><div id="badge" class="badge">Official: G-Buffer → SSAO → Blur → Lighting</div><div id="status" class="status">Loading official nanosuit…</div><div class="status" style="top:auto;bottom:12px">WASD 移动 · 鼠标拖拽旋转 · 滚轮缩放 · R 重置视角</div></div>
 <div class="controls">
 <label class="ctl">Kernel <input id="kernel" type="range" min="8" max="64" step="8" value="64"><span id="kernelVal">64</span></label>
 <label class="ctl">Radius <input id="radius" type="range" min="0.10" max="1.50" step="0.05" value="0.50"><span id="radiusVal">0.50</span></label>
@@ -24,7 +24,7 @@
 <button id="range" class="active">Range Check ON</button>
 <button id="noise" class="active">Noise Rotation ON</button>
 <button id="blurToggle" class="active">Blur ON</button>
-<button id="reset">Reset Official Defaults</button>
+<button id="reset">Reset Official Defaults</button><button id="resetCamera">Reset Camera</button>
 </div></section>
 <div class="grid">
 <section class="card"><h2>Official 场景</h2><p>按 LearnOpenGL 经典 SSAO demo：先渲染放大的 Floor Cube，再渲染 Nanosuit 人物模型。Geometry Pass 保存 View-Space Position / Normal / Albedo。</p><pre>floor:
