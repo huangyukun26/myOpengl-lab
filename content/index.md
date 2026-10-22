@@ -35,9 +35,10 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 [[learn/05-advanced-lighting/06-parallax-mapping|06 · Parallax Mapping 视差贴图]]  
 [[learn/05-advanced-lighting/07-hdr|07 · HDR 高动态范围]]  
 [[learn/05-advanced-lighting/08-bloom|08 · Bloom 泛光]]  
-[[learn/05-advanced-lighting/09-deferred-shading|09 · Deferred Shading 延迟着色法]]
+[[learn/05-advanced-lighting/09-deferred-shading|09 · Deferred Shading 延迟着色法]]  
+[[learn/05-advanced-lighting/10-ssao|10 · SSAO 屏幕空间环境光遮蔽]]
 
-当前章节：**Deferred Shading**。Geometry Pass 先把 Position / Normal / Albedo+Specular 写入 G-Buffer，Lighting Pass 再用 Fullscreen Quad 统一读取这些表面数据并计算大量光源。
+当前章节：**SSAO**。利用 G-Buffer 中的 View-Space Position / Normal，在当前 Fragment 周围建立半球 Sample Kernel，投影回屏幕做深度比较，生成 AO Texture；Blur 后只乘到 Ambient 项。
 
 ## Interactive Labs
 
@@ -59,4 +60,5 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 <form action="/myOpengl-lab/static/labs/hdr.html" method="get"><button type="submit">🎮 HDR Lab · LDR Clamp / Float Buffer / Exposure</button></form>
 <form action="/myOpengl-lab/static/labs/bloom.html" method="get"><button type="submit">🎮 Bloom Lab · Threshold / Blur / Composite</button></form>
 <form action="/myOpengl-lab/static/labs/deferred-shading.html" method="get"><button type="submit">🎮 Deferred Shading Lab · G-Buffer / Lights / Final</button></form>
+<form action="/myOpengl-lab/static/labs/ssao.html" method="get"><button type="submit">🎮 SSAO Lab · Kernel / Radius / Bias / Noise / Blur</button></form>
 
