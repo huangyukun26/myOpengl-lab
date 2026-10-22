@@ -222,12 +222,12 @@ function transformPoint(m,p){return[m[0]*p[0]+m[4]*p[1]+m[8]*p[2]+m[12],m[1]*p[0
 
 const proj=perspective(Math.PI/4,canvas.width/canvas.height,.1,50);
 const view=lookAt([0,0,5],[0,0,0],[0,1,0]);
-const roomModel=mul(T(0,7,0),S(7.5,7.5,7.5));
-const backpackModel=mul(T(0,.5,0),RX(-Math.PI/2));
+const floorModel=mul(T(0,-1,0),S(20,1,20));
+const nanosuitModel=mul(mul(T(0,0,5),RX(-Math.PI/2)),S(.5,.5,.5));
 const lightWorld=[2,4,-2];
 const lightView=transformPoint(view,lightWorld);
 
-let backpack=null;
+let nanosuit=null;
 let mode=0,kernelSize=64,radius=.5,bias=.025,power=1,useNoise=true,useRange=true,blurOn=true;
 
 function bindTex(unit,t,p,name){gl.activeTexture(gl.TEXTURE0+unit);gl.bindTexture(gl.TEXTURE_2D,t);gl.uniform1i(U(p,name),unit);}
@@ -246,8 +246,8 @@ function renderGeometry(){
  gl.useProgram(geomP);
  gl.uniformMatrix4fv(U(geomP,'uView'),false,view);
  gl.uniformMatrix4fv(U(geomP,'uProj'),false,proj);
- drawMesh(cube,roomModel,true);
- if(backpack)drawMesh(backpack,backpackModel,false);
+ drawMesh(cube,floorModel,false);
+ if(nanosuit)drawMesh(nanosuit,nanosuitModel,false);
 }
 
 function renderSSAO(){
@@ -286,18 +286,18 @@ function renderFinal(){
 
 function frame(){renderGeometry();renderSSAO();renderBlur();renderFinal();requestAnimationFrame(frame);}
 
-async function loadOfficialBackpack(){
+async function loadOfficialNanosuit(){
  try{
-   const url='https://raw.githubusercontent.com/JoeyDeVries/LearnOpenGL/master/resources/objects/backpack/backpack.obj';
+   const url='https://raw.githubusercontent.com/JoeyDeVries/LearnOpenGL/master/resources/objects/nanosuit/nanosuit.obj';
    const res=await fetch(url);
    if(!res.ok)throw new Error('HTTP '+res.status);
    const text=await res.text();
    const data=parseOBJ(text);
-   backpack=vaoFromInterleaved(data);
-   statusEl.textContent='Official backpack loaded · '+backpack.count.toLocaleString()+' vertices';
+   nanosuit=vaoFromInterleaved(data);
+   statusEl.textContent='Official nanosuit loaded · '+nanosuit.count.toLocaleString()+' vertices';
  }catch(err){
    console.error(err);
-   statusEl.textContent='Backpack load failed · room still rendering';
+   statusEl.textContent='Nanosuit load failed · floor still rendering';
  }
 }
 
@@ -322,6 +322,6 @@ document.getElementById('reset').addEventListener('click',()=>{
  for(const [id,on,label] of [['range',useRange,'Range Check'],['noise',useNoise,'Noise Rotation'],['blurToggle',blurOn,'Blur']]){const el=document.getElementById(id);el.classList.toggle('active',on);el.textContent=label+' '+(on?'ON':'OFF');}
 });
 
-loadOfficialBackpack();
+loadOfficialNanosuit();
 requestAnimationFrame(frame);
 })();
