@@ -222,10 +222,10 @@ function mul(a,b){const o=new Float32Array(16);for(let c=0;c<4;c++)for(let r=0;r
     o[c*4+r]=a[0*4+r]*b[c*4+0]+a[1*4+r]*b[c*4+1]+a[2*4+r]*b[c*4+2]+a[3*4+r]*b[c*4+3];
 }return o;}
 
-let yaw=0,pitch=0,distance=26,viewMode=0;
-const state={row:-1,col:-1,metal:.5,rough:.5,albedo:[0.7,0.29,0.13],ao:1,intensity:1};
+let yaw=0,pitch=0,distance=25,viewMode=0;
+const state={row:-1,col:-1,metal:.5,rough:.5,albedo:[0.5,0.0,0.0],ao:1,intensity:1};
 let pressed=false,lastX=0,lastY=0;
-const resetCamera=()=>{yaw=0;pitch=0;distance=26;};
+const resetCamera=()=>{yaw=0;pitch=0;distance=25;};
 canvas.addEventListener("pointerdown",e=>{pressed=true;lastX=e.clientX;lastY=e.clientY;canvas.setPointerCapture(e.pointerId);});
 canvas.addEventListener("pointermove",e=>{if(!pressed)return;yaw+=(e.clientX-lastX)*0.005;pitch=Math.max(-1.35,Math.min(1.35,pitch+(e.clientY-lastY)*0.005));lastX=e.clientX;lastY=e.clientY;});
 canvas.addEventListener("pointerup",()=>pressed=false);
@@ -256,7 +256,7 @@ document.getElementById("reset").onclick=()=>{
     for(const [id,value] of [["metallic",".5"],["roughness",".5"],["ao","1"],["intensity","1"]]){
         const el=document.getElementById(id);el.value=value;el.dispatchEvent(new Event("input"));
     }
-    const color=document.getElementById("albedo");color.value="#b36644";color.dispatchEvent(new Event("input"));
+    const color=document.getElementById("albedo");color.value="#bc0000";color.dispatchEvent(new Event("input"));
     tabs[0].click();
 };
 gl.enable(gl.DEPTH_TEST);
