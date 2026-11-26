@@ -7,7 +7,7 @@ const canvas=document.getElementById("scene"), status=document.getElementById("s
 const gl=canvas.getContext("webgl2",{antialias:true,alpha:false,depth:true,preserveDrawingBuffer:false});
 if(!gl){status.textContent="需要支持 WebGL2 的浏览器";return;}
 
-const vs = \`#version 300 es
+const vs = `#version 300 es
 precision highp float;
 layout(location=0) in vec3 aPos;
 layout(location=1) in vec3 aNormal;
@@ -23,9 +23,9 @@ void main(){
     WorldPos = aPos*uScale + uOffset;
     Normal = aNormal;
     gl_Position = uViewProjection * vec4(WorldPos,1.0);
-}\`;
+}`;
 
-const fs = \`#version 300 es
+const fs = `#version 300 es
 precision highp float;
 in vec3 WorldPos;
 in vec3 Normal;
@@ -146,7 +146,7 @@ void main(){
     vec3 mapped=hdr/(hdr+vec3(1.0));
     mapped=pow(mapped,vec3(1.0/2.2));
     FragColor=vec4(mapped,1.0);
-}\`;
+}`;
 
 function compile(type,source){
     const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);
