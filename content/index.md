@@ -38,7 +38,12 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 [[learn/05-advanced-lighting/09-deferred-shading|09 · Deferred Shading 延迟着色法]]  
 [[learn/05-advanced-lighting/10-ssao|10 · SSAO 屏幕空间环境光遮蔽]]
 
-当前章节：**SSAO**。利用 G-Buffer 中的 View-Space Position / Normal，在当前 Fragment 周围建立半球 Sample Kernel，投影回屏幕做深度比较，生成 AO Texture；Blur 后只乘到 Ambient 项。
+当前章节：**PBR Lighting（直接光照材质）**。从 N、V、L、H 开始，在片元着色器里计算 GGX D / Smith G / Fresnel F，形成 Cook–Torrance BRDF；对四盏灯求和，再做 HDR Tone Mapping 与 Gamma。
+
+### PBR
+
+[🎮 PBR Lighting · 官方 7×7 材质球交互 Lab](/myOpengl-lab/static/labs/pbr-lighting.html)  
+[🔎 PBR Lighting · 完整 Forward Pipeline](/myOpengl-lab/static/labs/pipeline/pbr-01-lighting.html)
 
 ## Interactive Labs
 
@@ -61,4 +66,5 @@ description: 按 LearnOpenGL 的阅读顺序推进，并把每一节放回完整
 <form action="/myOpengl-lab/static/labs/bloom.html" method="get"><button type="submit">🎮 Bloom Lab · Threshold / Blur / Composite</button></form>
 <form action="/myOpengl-lab/static/labs/deferred-shading.html" method="get"><button type="submit">🎮 Deferred Shading Lab · G-Buffer / Lights / Final</button></form>
 <form action="/myOpengl-lab/static/labs/ssao.html" method="get"><button type="submit">🎮 SSAO Lab · Kernel / Radius / Bias / Noise / Blur</button></form>
+<form action="/myOpengl-lab/static/labs/pbr-lighting.html" method="get"><button type="submit">🎮 PBR Lighting Lab · D / G / F / Metallic / Roughness</button></form>
 
